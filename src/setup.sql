@@ -1,3 +1,5 @@
+
+
 -- ========================================
 -- Organization Table
 -- ========================================
@@ -12,7 +14,6 @@ CREATE TABLE organization (
 
 -- ========================================
 -- Service Project Table
--- Each project belongs to one organization.
 -- ========================================
 
 CREATE TABLE service_project (
@@ -23,7 +24,7 @@ CREATE TABLE service_project (
 
     CONSTRAINT fk_project_organization
         FOREIGN KEY (organization_id)
-        REFERENCES organization (organization_id)
+        REFERENCES organization(organization_id)
         ON DELETE CASCADE
 );
 
@@ -38,7 +39,6 @@ CREATE TABLE category (
 
 -- ========================================
 -- Project Category Table
--- Many-to-Many Relationship
 -- ========================================
 
 CREATE TABLE project_category (
@@ -126,14 +126,10 @@ VALUES
 INSERT INTO project_category
 (project_id, category_id)
 VALUES
--- Park Cleanup
 (1,1),
 (1,2),
-
--- Food Drive
 (2,1),
 (2,4),
-
--- Community Tutoring
 (3,1),
 (3,3);
+
