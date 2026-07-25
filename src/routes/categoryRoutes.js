@@ -1,15 +1,28 @@
 import express from "express";
-import {
-    buildCategoryList,
-    buildCategoryDetail
-} from "../controllers/categoryController.js";
+import * as categoryController from "../controllers/categoryController.js";
 
 const router = express.Router();
 
-// List all categories
-router.get("/", buildCategoryList);
+/**
+ * Category List
+ */
+router.get("/", categoryController.buildCategoryList);
 
-// Category details page
-router.get("/:id", buildCategoryDetail);
+/**
+ * Create Category
+ */
+router.get("/new-category", categoryController.buildNewCategory);
+router.post("/new-category", categoryController.addCategory);
+
+/**
+ * Edit Category
+ */
+router.get("/edit-category/:id", categoryController.buildEditCategory);
+router.post("/edit-category/:id", categoryController.editCategory);
+
+/**
+ * Category Details
+ */
+router.get("/:id", categoryController.buildCategoryDetail);
 
 export default router;

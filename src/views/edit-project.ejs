@@ -1,0 +1,89 @@
+<h1>Edit Service Project</h1>
+
+
+<% if (errors.length > 0) { %>
+
+<ul class="errors">
+
+    <% errors.forEach(error => { %>
+
+        <li><%= error.msg %></li>
+
+    <% }) %>
+
+</ul>
+
+<% } %>
+
+
+
+<form action="/projects/edit-project/<%= project.project_id %>" method="POST">
+
+
+    <label for="name">
+        Project Name
+    </label>
+
+    <input
+        type="text"
+        id="name"
+        name="name"
+        value="<%= project.name %>"
+        required
+        maxlength="100">
+
+
+
+    <label for="description">
+        Project Description
+    </label>
+
+    <textarea
+        id="description"
+        name="description"
+        required><%= project.description %></textarea>
+
+
+
+
+    <label for="organization_id">
+        Organization
+    </label>
+
+
+    <select
+        id="organization_id"
+        name="organization_id"
+        required>
+
+
+        <option value="">
+            Select Organization
+        </option>
+
+
+        <% organizations.forEach(organization => { %>
+
+            <option
+                value="<%= organization.organization_id %>"
+                <%= project.organization_id == organization.organization_id ? "selected" : "" %>>
+
+                <%= organization.name %>
+
+            </option>
+
+
+        <% }) %>
+
+
+    </select>
+
+
+
+
+    <button type="submit">
+        Update Project
+    </button>
+
+
+</form>

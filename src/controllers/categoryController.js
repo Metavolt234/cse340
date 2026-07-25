@@ -1,25 +1,25 @@
 import {
     getAllCategories,
     getCategoryById,
-    getProjectsByCategory
+    getProjectsByCategory,
+    createCategory,
+    updateCategory
 } from "../models/categories.js";
 
 /**
  * Display all categories
  */
 const buildCategoryList = async (req, res) => {
-
     const categories = await getAllCategories();
 
     res.render("categories", {
-        title: "Service Categories",
+        title: "Categories",
         categories
     });
-
 };
 
 /**
- * Display one category and its projects
+ * Display category details
  */
 const buildCategoryDetail = async (req, res) => {
 
@@ -34,10 +34,94 @@ const buildCategoryDetail = async (req, res) => {
         category,
         projects
     });
+};
+
+/**
+ * Build Create Category View
+ */
+const buildNewCategory = (req, res) => {
+
+    res.render("new-category", {
+        title: "Create Category",
+        errors: [],
+        categoryName: ""
+    });
+
+};
+
+/**
+ * Save Category
+ */
+const addCategory = async (req, res) => {
+
+    const { categoryName } = req.body;
+
+    if (!categoryName || categoryName.trim().length < 3 || categoryName.length > 100) {
+
+        return res.render("new-category", {
+            title: "Create Category",
+            errors: [{
+                msg: "Category name must be between 3 and 100 characters."
+            }],
+            categoryName
+        });
+
+    }
+
+    await createCategory(categoryName);
+
+    res.redirect("/categories");
+
+};
+
+/**
+ * Build Edit Category View
+ */
+const buildEditCategory = async (req, res) => {
+
+    const category = await getCategoryById(req.params.id);
+
+    res.render("edit-category", {
+        title: "Edit Category",
+        errors: [],
+        category
+    });
+
+};
+
+/**
+ * Update Category
+ */
+const editCategory = async (req, res) => {
+
+    const { categoryName } = req.body;
+
+    if (!categoryName || categoryName.trim().length < 3 || categoryName.length > 100) {
+
+        return res.render("edit-category", {
+            title: "Edit Category",
+            errors: [{
+                msg: "Category name must be between 3 and 100 characters."
+            }],
+            category: {
+                category_id: req.params.id,
+                name: categoryName
+            }
+        });
+
+    }
+
+    await updateCategory(req.params.id, categoryName);
+
+    res.redirect("/categories");
 
 };
 
 export {
     buildCategoryList,
-    buildCategoryDetail
+    buildCategoryDetail,
+    buildNewCategory,
+    addCategory,
+    buildEditCategory,
+    editCategory
 };

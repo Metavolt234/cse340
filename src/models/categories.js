@@ -1,4 +1,4 @@
-import db from './db.js';
+import db from "./db.js";
 
 /**
  * Get all categories
@@ -6,7 +6,9 @@ import db from './db.js';
 const getAllCategories = async () => {
 
     const query = `
-        SELECT category_id, name
+        SELECT
+            category_id,
+            name
         FROM category
         ORDER BY name;
     `;
@@ -17,12 +19,14 @@ const getAllCategories = async () => {
 };
 
 /**
- * Get one category by ID
+ * Get one category
  */
 const getCategoryById = async (categoryId) => {
 
     const query = `
-        SELECT *
+        SELECT
+            category_id,
+            name
         FROM category
         WHERE category_id = $1;
     `;
@@ -33,7 +37,7 @@ const getCategoryById = async (categoryId) => {
 };
 
 /**
- * Get all projects for a category
+ * Get all projects in a category
  */
 const getProjectsByCategory = async (categoryId) => {
 
@@ -41,8 +45,12 @@ const getProjectsByCategory = async (categoryId) => {
         SELECT
             sp.project_id,
             sp.name,
-            sp.description
+            sp.description,
+            o.organization_id,
+            o.name AS organization_name
         FROM service_project sp
+        JOIN organization o
+            ON sp.organization_id = o.organization_id
         JOIN project_category pc
             ON sp.project_id = pc.project_id
         WHERE pc.category_id = $1
@@ -54,8 +62,43 @@ const getProjectsByCategory = async (categoryId) => {
     return result.rows;
 };
 
+/**
+ * Create category
+ */
+const createCategory = async (name) => {
+
+    const query = `
+        INSERT INTO category (name)
+        VALUES ($1)
+        RETURNING *;
+    `;
+
+    const result = await db.query(query, [name]);
+
+    return result.rows[0];
+};
+
+/**
+ * Update category
+ */
+const updateCategory = async (categoryId, name) => {
+
+    const query = `
+        UPDATE category
+        SET name = $1
+        WHERE category_id = $2
+        RETURNING *;
+    `;
+
+    const result = await db.query(query, [name, categoryId]);
+
+    return result.rows[0];
+};
+
 export {
     getAllCategories,
     getCategoryById,
-    getProjectsByCategory
-};
+    getProjectsByCategory,
+    createCategory,
+    updateCategory
+}
