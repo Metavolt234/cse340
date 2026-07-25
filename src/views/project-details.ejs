@@ -1,0 +1,47 @@
+<%- include('partials/header') %>
+
+<main>
+
+    <h1><%= project.name %></h1>
+
+    <p>
+        <strong>Description:</strong><br>
+        <%= project.description %>
+    </p>
+
+    <p>
+        <strong>Organization:</strong>
+        <a href="/organizations/<%= project.organization_id %>">
+            <%= project.organization_name %>
+        </a>
+    </p>
+
+    <h2>Categories</h2>
+
+    <% if (categories.length > 0) { %>
+
+        <ul>
+
+            <% categories.forEach(category => { %>
+
+                <li>
+
+                    <a href="/categories/<%= category.category_id %>">
+                        <%= category.name %>
+                    </a>
+
+                </li>
+
+            <% }) %>
+
+        </ul>
+
+    <% } else { %>
+
+        <p>No categories assigned.</p>
+
+    <% } %>
+
+</main>
+
+<%- include('partials/footer') %>
