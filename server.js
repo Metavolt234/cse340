@@ -4,9 +4,7 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 
 import { testConnection } from './src/models/db.js';
-import { getAllOrganizations } from './src/models/organizations.js';
-import { getAllCategories } from './src/models/categories.js';
-import { getAllProjects } from './src/models/projects.js';
+
 import categoryRoutes from "./src/routes/categoryRoutes.js";
 import projectRoutes from "./src/routes/projectRoutes.js";
 import organizationRoutes from "./src/routes/organizationRoutes.js";
@@ -56,6 +54,23 @@ app.use("/projects", projectRoutes);
 //Categories page
 
 app.use("/categories", categoryRoutes);
+
+//Errors
+//404
+app.use((req, res) => {
+    res.status(404).render("404", {
+        title: "404 - Page Not Found"
+    });
+});
+
+//500
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+
+    res.status(500).render("500", {
+        title: "500 - Server Error"
+    });
+});
 
 /**
  * Start the server

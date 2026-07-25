@@ -48,15 +48,18 @@ const getProjectById = async (projectId) => {
 const getCategoriesByProject = async (projectId) => {
 
     const query = `
-        SELECT
-            c.category_id,
-            c.name
-        FROM category c
-        JOIN project_category pc
-            ON c.category_id = pc.category_id
-        WHERE pc.project_id = $1
-        ORDER BY c.name;
-    `;
+    SELECT
+        sp.project_id,
+        sp.name,
+        sp.description,
+        o.organization_id,
+        o.name AS organization_name
+    FROM service_project sp
+    JOIN organization o
+        ON sp.organization_id = o.organization_id
+    ORDER BY sp.project_id
+    LIMIT 5;
+`;
 
     const result = await db.query(query, [projectId]);
 
