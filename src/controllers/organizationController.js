@@ -6,7 +6,6 @@ import {
     updateOrganization
 } from "../models/organizations.js";
 
-
 /**
  * Display all organizations
  */
@@ -18,7 +17,6 @@ const buildOrganizationList = async (req, res) => {
         title: "Organizations",
         organizations
     });
-
 };
 
 
@@ -38,7 +36,6 @@ const buildOrganizationDetail = async (req, res) => {
         organization,
         projects
     });
-
 };
 
 
@@ -53,9 +50,8 @@ const buildNewOrganization = (req, res) => {
         organization: {
             name: "",
             description: "",
-            address: "",
-            phone: "",
-            email: ""
+            contact_email: "",
+            logo_filename: ""
         }
     });
 
@@ -70,21 +66,18 @@ const addOrganization = async (req, res) => {
     const {
         name,
         description,
-        address,
-        phone,
-        email
+        contact_email,
+        logo_filename
     } = req.body;
-
 
     const errors = [];
 
-
+    // Server-side validation
     if (!name || name.trim().length < 3) {
         errors.push({
             msg: "Organization name must be at least 3 characters."
         });
     }
-
 
     if (name && name.length > 100) {
         errors.push({
@@ -92,6 +85,23 @@ const addOrganization = async (req, res) => {
         });
     }
 
+    if (!description || description.trim() === "") {
+        errors.push({
+            msg: "Description is required."
+        });
+    }
+
+    if (!contact_email || contact_email.trim() === "") {
+        errors.push({
+            msg: "Contact email is required."
+        });
+    }
+
+    if (!logo_filename || logo_filename.trim() === "") {
+        errors.push({
+            msg: "Logo filename is required."
+        });
+    }
 
     if (errors.length > 0) {
 
@@ -103,15 +113,12 @@ const addOrganization = async (req, res) => {
 
     }
 
-
     await createOrganization(
         name,
         description,
-        address,
-        phone,
-        email
+        contact_email,
+        logo_filename
     );
-
 
     res.redirect("/organizations");
 
@@ -124,7 +131,6 @@ const addOrganization = async (req, res) => {
 const buildEditOrganization = async (req, res) => {
 
     const organization = await getOrganizationById(req.params.id);
-
 
     res.render("edit-organization", {
         title: "Edit Organization",
@@ -143,32 +149,42 @@ const editOrganization = async (req, res) => {
     const {
         name,
         description,
-        address,
-        phone,
-        email
+        contact_email,
+        logo_filename
     } = req.body;
-
 
     const errors = [];
 
-
+    // Server-side validation
     if (!name || name.trim().length < 3) {
-
         errors.push({
             msg: "Organization name must be at least 3 characters."
         });
-
     }
 
-
     if (name && name.length > 100) {
-
         errors.push({
             msg: "Organization name cannot exceed 100 characters."
         });
-
     }
 
+    if (!description || description.trim() === "") {
+        errors.push({
+            msg: "Description is required."
+        });
+    }
+
+    if (!contact_email || contact_email.trim() === "") {
+        errors.push({
+            msg: "Contact email is required."
+        });
+    }
+
+    if (!logo_filename || logo_filename.trim() === "") {
+        errors.push({
+            msg: "Logo filename is required."
+        });
+    }
 
     if (errors.length > 0) {
 
@@ -177,22 +193,22 @@ const editOrganization = async (req, res) => {
             errors,
             organization: {
                 organization_id: req.params.id,
-                ...req.body
+                name,
+                description,
+                contact_email,
+                logo_filename
             }
         });
 
     }
 
-
     await updateOrganization(
         req.params.id,
         name,
         description,
-        address,
-        phone,
-        email
+        contact_email,
+        logo_filename
     );
-
 
     res.redirect("/organizations");
 

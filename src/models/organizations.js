@@ -10,9 +10,8 @@ const getAllOrganizations = async () => {
             organization_id,
             name,
             description,
-            address,
-            phone,
-            email
+            contact_email,
+            logo_filename
         FROM organization
         ORDER BY name;
     `;
@@ -33,9 +32,8 @@ const getOrganizationById = async (organizationId) => {
             organization_id,
             name,
             description,
-            address,
-            phone,
-            email
+            contact_email,
+            logo_filename
         FROM organization
         WHERE organization_id = $1;
     `;
@@ -73,9 +71,8 @@ const getProjectsByOrganization = async (organizationId) => {
 const createOrganization = async (
     name,
     description,
-    address,
-    phone,
-    email
+    contact_email,
+    logo_filename
 ) => {
 
     const sql = `
@@ -83,21 +80,19 @@ const createOrganization = async (
         (
             name,
             description,
-            address,
-            phone,
-            email
+            contact_email,
+            logo_filename
         )
         VALUES
-        ($1,$2,$3,$4,$5)
+        ($1,$2,$3,$4)
         RETURNING *;
     `;
 
     const result = await db.query(sql, [
         name,
         description,
-        address,
-        phone,
-        email
+        contact_email,
+        logo_filename
     ]);
 
     return result.rows[0];
@@ -111,9 +106,8 @@ const updateOrganization = async (
     organizationId,
     name,
     description,
-    address,
-    phone,
-    email
+    contact_email,
+    logo_filename
 ) => {
 
     const sql = `
@@ -121,19 +115,17 @@ const updateOrganization = async (
         SET
             name = $1,
             description = $2,
-            address = $3,
-            phone = $4,
-            email = $5
-        WHERE organization_id = $6
+            contact_email = $3,
+            logo_filename = $4
+        WHERE organization_id = $5
         RETURNING *;
     `;
 
     const result = await db.query(sql, [
         name,
         description,
-        address,
-        phone,
-        email,
+        contact_email,
+        logo_filename,
         organizationId
     ]);
 
