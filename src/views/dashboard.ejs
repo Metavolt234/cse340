@@ -1,0 +1,50 @@
+<%- include('partials/header') %>
+
+
+<main>
+
+
+<div class="dashboard-card">
+
+
+<h1>
+Dashboard
+</h1>
+
+
+<h2>
+Welcome <%= name %>
+</h2>
+
+
+<p>
+Email:
+<strong>
+<%= email %>
+</strong>
+</p>
+
+
+
+<% if(user.role_name === "admin"){ %>
+
+<a 
+class="action-link"
+href="/users">
+
+Manage Users
+
+</a>
+
+
+<% } %>
+
+
+
+</div>
+
+
+</main>
+
+
+<%- include('partials/footer') %>

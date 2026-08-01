@@ -1,0 +1,53 @@
+<%- include('partials/header') %>
+
+
+<main>
+
+
+<div class="form-container">
+
+
+<h1>
+Login
+</h1>
+
+
+
+<form action="/login" method="POST">
+
+
+<label>Email</label>
+
+<input
+type="email"
+name="email"
+required
+>
+
+
+
+<label>Password</label>
+
+<input
+type="password"
+name="password"
+required
+>
+
+
+<button type="submit">
+Login
+</button>
+
+
+</form>
+
+
+</div>
+
+
+</main>
+
+
+
+<%- include('partials/footer') %>
