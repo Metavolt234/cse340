@@ -55,10 +55,29 @@ const __dirname =
 
 
 /* =========================================
-   EXPRESS
+   EXPRESS APPLICATION
 ========================================= */
 
 const app = express();
+
+
+
+/*
+ * Render runs behind a proxy.
+ *
+ * This allows Express to correctly
+ * understand HTTPS requests coming
+ * through Render.
+ */
+
+if (NODE_ENV === "production") {
+
+    app.set(
+        "trust proxy",
+        1
+    );
+
+}
 
 
 
@@ -131,7 +150,14 @@ app.use(
 
         cookie: {
 
-            secure: false,
+            /*
+             * Render uses HTTPS in production.
+             */
+
+            secure:
+                NODE_ENV === "production",
+
+            httpOnly: true,
 
             maxAge:
                 1000 * 60 * 60 * 24
@@ -144,7 +170,7 @@ app.use(
 
 
 /* =========================================
-   FLASH
+   FLASH MESSAGES
 ========================================= */
 
 app.use(
@@ -163,34 +189,89 @@ app.use(
         try {
 
             /*
-             * Flash messages
+             * ---------------------------------
+             * FLASH MESSAGES
+             * ---------------------------------
+             *
+             * Make flash available to every
+             * EJS view.
              */
+
             res.locals.flash =
                 req.flash();
 
 
+
             /*
-             * Login status
+             * ---------------------------------
+             * LOGIN STATUS
+             * ---------------------------------
              */
+
             res.locals.isLoggedIn =
                 Boolean(
-                    req.session?.user
+                    req.session &&
+                    req.session.user
                 );
 
 
+
             /*
-             * Current user
+             * ---------------------------------
+             * CURRENT USER
+             * ---------------------------------
              */
+
             res.locals.user =
                 req.session?.user
                 || null;
 
 
+
             /*
-             * Environment
+             * ---------------------------------
+             * ADMIN STATUS
+             * ---------------------------------
+             *
+             * This is important because
+             * several views use:
+             *
+             * <% if (isAdmin) { %>
              */
+
+            res.locals.isAdmin =
+                Boolean(
+                    req.session?.user &&
+                    (
+                        req.session.user.role_name === "admin" ||
+                        req.session.user.role === "admin"
+                    )
+                );
+
+
+
+            /*
+             * ---------------------------------
+             * USER ROLE
+             * ---------------------------------
+             */
+
+            res.locals.userRole =
+                req.session?.user?.role_name
+                || req.session?.user?.role
+                || null;
+
+
+
+            /*
+             * ---------------------------------
+             * ENVIRONMENT
+             * ---------------------------------
+             */
+
             res.locals.NODE_ENV =
                 NODE_ENV;
+
 
 
             next();
@@ -201,9 +282,12 @@ app.use(
                 "GLOBAL MIDDLEWARE ERROR:"
             );
 
-            console.error(error);
+            console.error(
+                error
+            );
 
             next(error);
+
         }
 
     }
@@ -212,12 +296,12 @@ app.use(
 
 
 /* =========================================
-   HOME
+   HOME PAGE
 ========================================= */
 
 app.get(
     "/",
-    (req, res, next) => {
+    async (req, res, next) => {
 
         try {
 
@@ -240,7 +324,7 @@ app.get(
 
 
 /* =========================================
-   ROUTES
+   ORGANIZATIONS
 ========================================= */
 
 app.use(
@@ -249,17 +333,32 @@ app.use(
 );
 
 
+
+/* =========================================
+   PROJECTS
+========================================= */
+
 app.use(
     "/projects",
     projectRoutes
 );
 
 
+
+/* =========================================
+   CATEGORIES
+========================================= */
+
 app.use(
     "/categories",
     categoryRoutes
 );
 
+
+
+/* =========================================
+   USERS / AUTHENTICATION
+========================================= */
 
 app.use(
     "/",
@@ -269,11 +368,18 @@ app.use(
 
 
 /* =========================================
-   404
+   404 ERROR
 ========================================= */
 
 app.use(
     (req, res) => {
+
+        console.error(
+            "404 - Page not found:",
+            req.method,
+            req.originalUrl
+        );
+
 
         res.status(404).render(
             "404",
@@ -314,17 +420,17 @@ app.use(
         );
 
         console.error(
-            "Method:",
+            "METHOD:",
             req.method
         );
 
         console.error(
-            "Message:",
+            "MESSAGE:",
             err.message
         );
 
         console.error(
-            "Stack:"
+            "STACK:"
         );
 
         console.error(
@@ -336,16 +442,23 @@ app.use(
         );
 
 
+
         /*
-         * Prevent another error if
-         * headers have already been sent.
+         * If Express already sent a response,
+         * pass the error to the default handler.
          */
+
         if (res.headersSent) {
 
             return next(err);
 
         }
 
+
+
+        /*
+         * Render the 500 page.
+         */
 
         res.status(500).render(
             "500",
@@ -368,26 +481,30 @@ app.listen(
     PORT,
     async () => {
 
+        console.log("");
+        console.log(
+            "================================="
+        );
+
+        console.log(
+            `Server running on port ${PORT}`
+        );
+
+        console.log(
+            `Environment: ${NODE_ENV}`
+        );
+
+        console.log(
+            "================================="
+        );
+
+
         try {
 
             await testConnection();
 
-
-            console.log("");
             console.log(
-                "================================="
-            );
-
-            console.log(
-                `Server running at http://127.0.0.1:${PORT}`
-            );
-
-            console.log(
-                `Environment: ${NODE_ENV}`
-            );
-
-            console.log(
-                "================================="
+                "Database connection successful."
             );
 
         } catch (error) {
