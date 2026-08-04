@@ -1,28 +1,90 @@
 <%- include('partials/header') %>
 
-<main>
+<main class="page-container">
 
-    <h1><%= title %></h1>
+```
+<section class="page-hero">
+    <div>
+        <span class="page-label">SERVICE NETWORK</span>
+        <h1><%= title %></h1>
+        <p>
+            Explore service categories and discover opportunities
+            where volunteers can make a difference.
+        </p>
+    </div>
+</section>
 
-    <h2>Service Categories</h2>
+<section class="content-section">
 
-    <ul>
+    <div class="section-heading">
+        <div>
+            <h2>Service Categories</h2>
+            <p>Browse the different areas of community service.</p>
+        </div>
 
-        <% categories.forEach(category => { %>
+        <% if (typeof isLoggedIn !== 'undefined' && isLoggedIn) { %>
+            <a href="/categories" class="btn btn-primary">
+                View Categories
+            </a>
+        <% } %>
+    </div>
 
-            <li>
+    <% if (categories && categories.length > 0) { %>
 
-                <a href="/categories/<%= category.category_id %>">
+        <div class="card-grid">
 
-                    <%= category.name %>
+            <% categories.forEach(category => { %>
 
-                </a>
+                <article class="info-card">
 
-            </li>
+                    <div class="card-icon">
+                        <span>✓</span>
+                    </div>
 
-        <% }) %>
+                    <div class="card-content">
 
-    </ul>
+                        <h3>
+                            <%= category.name %>
+                        </h3>
+
+                        <% if (category.description) { %>
+                            <p>
+                                <%= category.description %>
+                            </p>
+                        <% } else { %>
+                            <p>
+                                Discover service opportunities
+                                related to <%= category.name %>.
+                            </p>
+                        <% } %>
+
+                    </div>
+
+                </article>
+
+            <% }) %>
+
+        </div>
+
+    <% } else { %>
+
+        <div class="empty-state">
+
+            <div class="empty-icon">📂</div>
+
+            <h3>No Categories Available</h3>
+
+            <p>
+                There are currently no service categories
+                available in the system.
+            </p>
+
+        </div>
+
+    <% } %>
+
+</section>
+```
 
 </main>
 

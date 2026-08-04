@@ -1,525 +1,719 @@
-/* =====================================
-   GLOBAL RESET
-===================================== */
 
 * {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
+html {
+    scroll-behavior: smooth;
+}
 
 body {
-
-    margin: 0;
-
-    font-family: "Segoe UI", Arial, sans-serif;
-
+    font-family: "Segoe UI", Arial, Helvetica, sans-serif;
     background: #f1f5f9;
-
-    color: #333;
-
+    color: #1e293b;
+    line-height: 1.6;
+    min-height: 100vh;
 }
 
 
-
-/* =====================================
+/* =========================================================
    NAVIGATION
-===================================== */
-
+========================================================= */
 
 nav {
-
-    background: linear-gradient(
-        135deg,
-        #1e3a8a,
-        #2563eb
-    );
-
+    background: linear-gradient(135deg, #0f172a, #1e3a8a, #2563eb);
     padding: 18px 30px;
-
-    box-shadow: 0 3px 10px rgba(0,0,0,.15);
-
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
-
-
 
 nav ul {
-
     list-style: none;
-
     display: flex;
-
     flex-wrap: wrap;
-
     justify-content: center;
-
-    gap: 25px;
-
-    padding:0;
-
-    margin:0;
-
+    align-items: center;
+    gap: 10px;
 }
 
-
+nav li {
+    list-style: none;
+}
 
 nav a {
-
-    color:white;
-
-    text-decoration:none;
-
-    font-weight:600;
-
-    font-size:16px;
-
-    transition:.3s;
-
+    display: block;
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 15px;
+    padding: 9px 15px;
+    border-radius: 7px;
+    transition: all 0.25s ease;
 }
-
-
 
 nav a:hover {
-
-    color:#facc15;
-
+    background: rgba(255, 255, 255, 0.15);
+    color: #facc15;
+    transform: translateY(-1px);
 }
 
 
-
-
-/* =====================================
-   MAIN CONTAINER
-===================================== */
-
+/* =========================================================
+   MAIN CONTENT
+========================================================= */
 
 main {
-
-    max-width:1100px;
-
-    margin:40px auto;
-
-    background:white;
-
-    padding:40px;
-
-    border-radius:15px;
-
-    box-shadow:
-    0 10px 25px rgba(0,0,0,.08);
-
+    width: min(1100px, calc(100% - 40px));
+    margin: 40px auto;
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
 }
-
-
 
 h1 {
-
-    color:#1e3a8a;
-
-    text-align:center;
-
-    margin-bottom:25px;
-
+    color: #1e3a8a;
+    text-align: center;
+    font-size: 2.1rem;
+    margin-bottom: 25px;
 }
-
-
 
 h2 {
-
-    color:#2563eb;
-
+    color: #2563eb;
+    margin: 25px 0 15px;
 }
 
-
-
-
-/* =====================================
-   HOME PAGE
-===================================== */
-
-
-.main-logo {
-
-    display:block;
-
-    width:280px;
-
-    max-width:100%;
-
-    margin:30px auto;
-
+h3 {
+    color: #1e3a8a;
+    margin-bottom: 10px;
 }
 
-
+p {
+    margin-bottom: 15px;
+}
 
 main p {
+    font-size: 17px;
+    line-height: 1.8;
+}
 
-    font-size:17px;
+ul {
+    margin-left: 20px;
+}
 
-    line-height:1.7;
-
+li {
+    margin-bottom: 8px;
 }
 
 
+/* =========================================================
+   HOME PAGE
+========================================================= */
 
+.main-logo {
+    display: block;
+    width: 280px;
+    max-width: 100%;
+    margin: 35px auto;
+}
 
+.hero {
+    text-align: center;
+    padding: 25px 10px;
+}
 
-/* =====================================
-   FORMS (LOGIN + REGISTER)
-===================================== */
+.hero h1 {
+    font-size: 2.5rem;
+}
 
-
-.form-container {
-
-    max-width:450px;
-
-    margin:auto;
-
+.hero p {
+    max-width: 750px;
+    margin: 0 auto 25px;
 }
 
 
+/* =========================================================
+   PAGE HEADERS
+========================================================= */
 
-form {
+.page-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
 
-    background:#ffffff;
+.page-header h1 {
+    margin-bottom: 8px;
+}
 
-    padding:35px;
-
-    border-radius:15px;
-
-    box-shadow:
-    0 5px 20px rgba(0,0,0,.1);
-
+.page-header p {
+    color: #64748b;
 }
 
 
+/* =========================================================
+   CARDS
+========================================================= */
 
-form label {
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 22px;
+    margin-top: 25px;
+}
 
-    display:block;
+.card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 25px;
+    box-shadow: 0 5px 18px rgba(15, 23, 42, 0.06);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
 
-    margin-top:18px;
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 25px rgba(15, 23, 42, 0.12);
+}
 
-    font-weight:600;
-
-    color:#1e3a8a;
-
+.card h2,
+.card h3 {
+    margin-top: 0;
 }
 
 
-
-form input {
-
-
-    width:100%;
-
-    padding:13px;
-
-    margin-top:8px;
-
-    border-radius:8px;
-
-    border:1px solid #cbd5e1;
-
-    font-size:16px;
-
-}
-
-
-
-form input:focus {
-
-
-    outline:none;
-
-    border-color:#2563eb;
-
-    box-shadow:
-    0 0 5px rgba(37,99,235,.4);
-
-}
-
-
-
-
-
-button {
-
-
-    width:100%;
-
-    margin-top:25px;
-
-    padding:14px;
-
-    border:none;
-
-    border-radius:8px;
-
-    background:#2563eb;
-
-    color:white;
-
-    font-size:17px;
-
-    font-weight:bold;
-
-    cursor:pointer;
-
-    transition:.3s;
-
-}
-
-
-
-button:hover {
-
-
-    background:#1e40af;
-
-}
-
-
-
-
-/* =====================================
-   LINKS / BUTTON LINKS
-===================================== */
-
-
-a {
-
-    color:#2563eb;
-
-}
-
-
-
-.action-link {
-
-
-    display:inline-block;
-
-    background:#2563eb;
-
-    color:white;
-
-    padding:12px 20px;
-
-    border-radius:8px;
-
-    text-decoration:none;
-
-    margin-top:20px;
-
-}
-
-
-
-.action-link:hover {
-
-
-    background:#1e40af;
-
-}
-
-
-
-/* =====================================
+/* =========================================================
    DASHBOARD
-===================================== */
-
+========================================================= */
 
 .dashboard-card {
-
-
-    background:#eff6ff;
-
-    padding:30px;
-
-    border-radius:15px;
-
-    text-align:center;
-
-    border-left:6px solid #2563eb;
-
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+    padding: 35px;
+    border-radius: 16px;
+    text-align: center;
+    border-left: 6px solid #2563eb;
+    margin-bottom: 25px;
 }
-
-
 
 .dashboard-card h2 {
+    color: #1e3a8a;
+    margin-top: 0;
+}
 
-    color:#1e3a8a;
+.dashboard-card p {
+    color: #475569;
+}
 
+.dashboard-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 25px;
 }
 
 
+/* =========================================================
+   FORMS
+========================================================= */
 
+.form-container {
+    max-width: 520px;
+    margin: 0 auto;
+}
 
-/* =====================================
-   TABLE USERS PAGE
-===================================== */
+form {
+    background: #ffffff;
+    padding: 35px;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(15, 23, 42, 0.09);
+    border: 1px solid #e2e8f0;
+}
 
+form h2 {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 25px;
+}
 
-table {
+form label {
+    display: block;
+    margin-top: 18px;
+    margin-bottom: 7px;
+    font-weight: 600;
+    color: #1e3a8a;
+}
 
+form input,
+form textarea,
+form select {
+    width: 100%;
+    padding: 13px 14px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #1e293b;
+    font-size: 16px;
+    font-family: inherit;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
 
-    width:100%;
+form textarea {
+    min-height: 130px;
+    resize: vertical;
+}
 
-    border-collapse:collapse;
+form select {
+    cursor: pointer;
+}
 
-    margin-top:30px;
-
-    overflow:hidden;
-
-    border-radius:10px;
-
+form input:focus,
+form textarea:focus,
+form select:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
 
+/* =========================================================
+   BUTTONS
+========================================================= */
 
-thead {
+button,
+.btn {
+    display: inline-block;
+    border: none;
+    border-radius: 8px;
+    background: #2563eb;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 12px 20px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
 
+button {
+    width: 100%;
+    margin-top: 25px;
+}
 
-    background:#2563eb;
-
-    color:white;
-
+button:hover,
+.btn:hover {
+    background: #1e40af;
+    transform: translateY(-1px);
 }
 
 
+/* =========================================================
+   ACTION BUTTONS
+========================================================= */
 
-th {
+.action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 20px 0;
+}
 
+.action-link {
+    display: inline-block;
+    background: #2563eb;
+    color: #ffffff;
+    padding: 11px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.25s ease;
+}
 
-    padding:15px;
+.action-link:hover {
+    background: #1e40af;
+    color: #ffffff;
+    transform: translateY(-1px);
+}
 
-    text-align:left;
+.btn-success {
+    background: #16a34a;
+}
 
+.btn-success:hover {
+    background: #15803d;
+}
+
+.btn-warning {
+    background: #d97706;
+}
+
+.btn-warning:hover {
+    background: #b45309;
+}
+
+.btn-danger {
+    background: #dc2626;
+}
+
+.btn-danger:hover {
+    background: #b91c1c;
+}
+
+.btn-secondary {
+    background: #64748b;
+}
+
+.btn-secondary:hover {
+    background: #475569;
 }
 
 
+/* =========================================================
+   LINKS
+========================================================= */
 
-td {
+a {
+    color: #2563eb;
+}
 
-
-    padding:14px;
-
-    border-bottom:1px solid #ddd;
-
+a:hover {
+    color: #1e40af;
 }
 
 
+/* =========================================================
+   LOGIN / REGISTER
+========================================================= */
 
-tr:hover {
+.auth-page {
+    max-width: 600px;
+    margin: 0 auto;
+}
 
+.auth-title {
+    text-align: center;
+    margin-bottom: 10px;
+}
 
-    background:#eff6ff;
+.auth-subtitle {
+    text-align: center;
+    color: #64748b;
+    margin-bottom: 25px;
+}
 
+.auth-footer {
+    text-align: center;
+    margin-top: 20px;
+    color: #64748b;
 }
 
 
-
-
-
-/* =====================================
+/* =========================================================
    ERROR MESSAGES
-===================================== */
-
+========================================================= */
 
 .errors {
+    background: #fee2e2;
+    color: #991b1b;
+    border-left: 5px solid #dc2626;
+    padding: 15px 18px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
 
+.errors ul {
+    margin: 0;
+    padding-left: 20px;
+}
 
-    background:#fee2e2;
-
-    color:#991b1b;
-
-    padding:15px;
-
-    border-radius:10px;
-
-    margin-bottom:20px;
-
+.error-message {
+    color: #b91c1c;
+    font-weight: 600;
+    margin: 10px 0;
 }
 
 
+/* =========================================================
+   FLASH MESSAGES
+========================================================= */
 
+.flash {
+    width: min(1100px, calc(100% - 40px));
+    margin: 25px auto -15px;
+    padding: 15px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+}
 
-
+.flash-success,
 .success {
+    background: #dcfce7;
+    color: #166534;
+    border-left: 5px solid #16a34a;
+}
 
+.flash-error,
+.error {
+    background: #fee2e2;
+    color: #991b1b;
+    border-left: 5px solid #dc2626;
+}
 
-    background:#dcfce7;
-
-    color:#166534;
-
-    padding:15px;
-
-    border-radius:10px;
-
+.flash-info {
+    background: #dbeafe;
+    color: #1e40af;
+    border-left: 5px solid #2563eb;
 }
 
 
+/* =========================================================
+   TABLES
+========================================================= */
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    margin-top: 25px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffff;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+thead {
+    background: #1e3a8a;
+    color: #ffffff;
+}
+
+th {
+    padding: 15px;
+    text-align: left;
+    font-weight: 700;
+}
+
+td {
+    padding: 14px 15px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+tbody tr:hover {
+    background: #eff6ff;
+}
+
+tbody tr:last-child td {
+    border-bottom: none;
+}
 
 
+/* =========================================================
+   ADMIN AREA
+========================================================= */
 
-/* =====================================
+.admin-badge {
+    display: inline-block;
+    background: #fef3c7;
+    color: #92400e;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.user-badge {
+    display: inline-block;
+    background: #dbeafe;
+    color: #1e40af;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.admin-panel {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-left: 5px solid #2563eb;
+    padding: 25px;
+    border-radius: 12px;
+    margin: 25px 0;
+}
+
+.admin-panel h2 {
+    margin-top: 0;
+}
+
+
+/* =========================================================
+   LIST ITEMS
+========================================================= */
+
+.item-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.item-list li {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 18px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+}
+
+.item-list li:hover {
+    background: #eff6ff;
+}
+
+
+/* =========================================================
+   ORGANIZATION / PROJECT / CATEGORY DETAILS
+========================================================= */
+
+.details-card {
+    background: #f8fafc;
+    border-radius: 14px;
+    padding: 30px;
+    border: 1px solid #e2e8f0;
+}
+
+.details-card p {
+    margin-bottom: 12px;
+}
+
+.details-card strong {
+    color: #1e3a8a;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #64748b;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px dashed #cbd5e1;
+}
+
+
+/* =========================================================
    FOOTER
-===================================== */
-
+========================================================= */
 
 footer {
+    margin-top: 50px;
+    background: #0f172a;
+    color: #ffffff;
+    text-align: center;
+    padding: 25px 20px;
+}
+
+footer p {
+    margin: 0;
+    color: #cbd5e1;
+}
 
 
-    margin-top:50px;
+/* =========================================================
+   MOBILE RESPONSIVE
+========================================================= */
 
-    background:#1e3a8a;
+@media (max-width: 700px) {
 
-    color:white;
+    nav {
+        padding: 14px 15px;
+    }
 
-    text-align:center;
+    nav ul {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+        gap: 3px;
+    }
 
-    padding:20px;
+    nav a {
+        width: 100%;
+    }
 
+    main {
+        width: calc(100% - 24px);
+        margin: 20px auto;
+        padding: 22px;
+        border-radius: 12px;
+    }
+
+    h1 {
+        font-size: 1.7rem;
+    }
+
+    h2 {
+        font-size: 1.3rem;
+    }
+
+    form {
+        padding: 22px;
+    }
+
+    .dashboard-actions,
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .action-link,
+    .btn {
+        width: 100%;
+        text-align: center;
+    }
+
+    .hero h1 {
+        font-size: 2rem;
+    }
+
+    table {
+        min-width: 650px;
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
 
 }
 
 
+/* =========================================================
+   SMALL PHONES
+========================================================= */
 
-
-
-/* =====================================
-   MOBILE RESPONSIVE
-===================================== */
-
-
-@media(max-width:700px){
-
-
-    nav ul {
-
-        flex-direction:column;
-
-        align-items:center;
-
-    }
-
-
+@media (max-width: 420px) {
 
     main {
-
-        margin:20px;
-
-        padding:20px;
-
+        width: calc(100% - 16px);
+        padding: 17px;
     }
 
-
-
-    table {
-
-        font-size:14px;
-
+    form {
+        padding: 18px;
     }
 
+    form input,
+    form textarea,
+    form select {
+        font-size: 15px;
+    }
+
+    button {
+        font-size: 15px;
+    }
 
 }

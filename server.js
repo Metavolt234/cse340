@@ -1,51 +1,90 @@
-import express from 'express';
+import express from "express";
 import session from "express-session";
-import { fileURLToPath } from 'url';
-import path from 'path';
+import connectFlash from "connect-flash";
 
-import { testConnection } from './src/models/db.js';
+import {
+    fileURLToPath
+} from "url";
 
-import categoryRoutes from "./src/routes/categoryRoutes.js";
-import projectRoutes from "./src/routes/projectRoutes.js";
-import organizationRoutes from "./src/routes/organizationRoutes.js";
-import userRoutes from "./src/routes/userRoutes.js";
+import path from "path";
+
+import {
+    testConnection
+} from "./src/models/db.js";
 
 
-// Define environment
+import categoryRoutes
+    from "./src/routes/categoryRoutes.js";
+
+import projectRoutes
+    from "./src/routes/projectRoutes.js";
+
+import organizationRoutes
+    from "./src/routes/organizationRoutes.js";
+
+import userRoutes
+    from "./src/routes/userRoutes.js";
+
+
+
+/* =========================================
+   ENVIRONMENT
+========================================= */
 
 const NODE_ENV =
-    process.env.NODE_ENV?.toLowerCase() || 'production';
+    process.env.NODE_ENV?.toLowerCase()
+    || "production";
 
-
-// Define port
 
 const PORT =
     process.env.PORT || 3000;
 
 
 
-// Create __filename and __dirname
+/* =========================================
+   ES MODULE PATHS
+========================================= */
 
-const __filename = fileURLToPath(import.meta.url);
-
-const __dirname = path.dirname(__filename);
-
+const __filename =
+    fileURLToPath(import.meta.url);
 
 
-// Create Express application
+const __dirname =
+    path.dirname(__filename);
+
+
+
+/* =========================================
+   EXPRESS
+========================================= */
 
 const app = express();
 
 
 
+/* =========================================
+   EJS
+========================================= */
+
+app.set(
+    "view engine",
+    "ejs"
+);
 
 
-// ===============================
-// Middleware
-// ===============================
+app.set(
+    "views",
+    path.join(
+        __dirname,
+        "src/views"
+    )
+);
 
 
-// Parse form data
+
+/* =========================================
+   BODY PARSING
+========================================= */
 
 app.use(
     express.urlencoded({
@@ -54,31 +93,45 @@ app.use(
 );
 
 
-
-// Parse JSON
-
 app.use(
     express.json()
 );
 
 
 
+/* =========================================
+   STATIC FILES
+========================================= */
 
-// Session configuration
+app.use(
+    express.static(
+        path.join(
+            __dirname,
+            "public"
+        )
+    )
+);
+
+
+
+/* =========================================
+   SESSION
+========================================= */
 
 app.use(
     session({
 
         secret:
-            process.env.SESSION_SECRET ||
-            "cse340-secret-key",
+            process.env.SESSION_SECRET
+            || "cse340-secret-key",
 
         resave: false,
 
         saveUninitialized: false,
 
-
         cookie: {
+
+            secure: false,
 
             maxAge:
                 1000 * 60 * 60 * 24
@@ -90,107 +143,105 @@ app.use(
 
 
 
+/* =========================================
+   FLASH
+========================================= */
 
-// Make login information available to views
+app.use(
+    connectFlash()
+);
+
+
+
+/* =========================================
+   GLOBAL VIEW VARIABLES
+========================================= */
 
 app.use(
     (req, res, next) => {
 
+        try {
 
-        res.locals.isLoggedIn = false;
+            /*
+             * Flash messages
+             */
+            res.locals.flash =
+                req.flash();
 
 
-        if(
-            req.session &&
-            req.session.user
-        ){
+            /*
+             * Login status
+             */
+            res.locals.isLoggedIn =
+                Boolean(
+                    req.session?.user
+                );
 
-            res.locals.isLoggedIn = true;
+
+            /*
+             * Current user
+             */
+            res.locals.user =
+                req.session?.user
+                || null;
+
+
+            /*
+             * Environment
+             */
+            res.locals.NODE_ENV =
+                NODE_ENV;
+
+
+            next();
+
+        } catch (error) {
+
+            console.error(
+                "GLOBAL MIDDLEWARE ERROR:"
+            );
+
+            console.error(error);
+
+            next(error);
+        }
+
+    }
+);
+
+
+
+/* =========================================
+   HOME
+========================================= */
+
+app.get(
+    "/",
+    (req, res, next) => {
+
+        try {
+
+            res.render(
+                "home",
+                {
+                    title: "Home"
+                }
+            );
+
+        } catch (error) {
+
+            next(error);
 
         }
 
-
-
-        res.locals.user =
-            req.session.user || null;
-
-
-
-        next();
-
     }
 );
 
 
 
-
-// Serve static files
-
-app.use(
-    express.static(
-        path.join(__dirname, 'public')
-    )
-);
-
-
-
-
-
-// ===============================
-// EJS Configuration
-// ===============================
-
-
-app.set(
-    'view engine',
-    'ejs'
-);
-
-
-
-app.set(
-    'views',
-    path.join(__dirname, 'src/views')
-);
-
-
-
-
-
-
-
-// ===============================
-// Routes
-// ===============================
-
-
-
-// Home Page
-
-app.get(
-    '/',
-    async (req, res) => {
-
-
-        const title = "Home";
-
-
-        res.render(
-            "home",
-            {
-                title
-            }
-        );
-
-
-    }
-);
-
-
-
-
-
-// Organization Routes
+/* =========================================
+   ROUTES
+========================================= */
 
 app.use(
     "/organizations",
@@ -198,32 +249,17 @@ app.use(
 );
 
 
-
-
-
-// Project Routes
-
 app.use(
     "/projects",
     projectRoutes
 );
 
 
-
-
-
-// Category Routes
-
 app.use(
     "/categories",
     categoryRoutes
 );
 
-
-
-
-
-// User Routes
 
 app.use(
     "/",
@@ -232,106 +268,139 @@ app.use(
 
 
 
-
-
-
-
-// ===============================
-// Error Handling
-// ===============================
-
-
-// 404
+/* =========================================
+   404
+========================================= */
 
 app.use(
     (req, res) => {
-
 
         res.status(404).render(
             "404",
             {
                 title:
-                "404 - Page Not Found"
+                    "404 - Page Not Found"
             }
         );
-
 
     }
 );
 
 
 
-
-
-// 500
+/* =========================================
+   GLOBAL ERROR HANDLER
+========================================= */
 
 app.use(
     (err, req, res, next) => {
 
+        console.error("");
+        console.error(
+            "================================="
+        );
+
+        console.error(
+            "SERVER ERROR"
+        );
+
+        console.error(
+            "================================="
+        );
+
+        console.error(
+            "URL:",
+            req.originalUrl
+        );
+
+        console.error(
+            "Method:",
+            req.method
+        );
+
+        console.error(
+            "Message:",
+            err.message
+        );
+
+        console.error(
+            "Stack:"
+        );
 
         console.error(
             err.stack
         );
+
+        console.error(
+            "================================="
+        );
+
+
+        /*
+         * Prevent another error if
+         * headers have already been sent.
+         */
+        if (res.headersSent) {
+
+            return next(err);
+
+        }
 
 
         res.status(500).render(
             "500",
             {
                 title:
-                "500 - Server Error"
+                    "500 - Server Error"
             }
         );
-
 
     }
 );
 
 
 
-
-
-
-
-// ===============================
-// Start Server
-// ===============================
-
+/* =========================================
+   START SERVER
+========================================= */
 
 app.listen(
     PORT,
-
     async () => {
 
-
         try {
-
 
             await testConnection();
 
 
-
+            console.log("");
             console.log(
-                `Server is running at http://127.0.0.1:${PORT}`
+                "================================="
             );
 
+            console.log(
+                `Server running at http://127.0.0.1:${PORT}`
+            );
 
             console.log(
                 `Environment: ${NODE_ENV}`
             );
 
+            console.log(
+                "================================="
+            );
 
-
-        } catch(error) {
-
+        } catch (error) {
 
             console.error(
-                "Error connecting to database:",
+                "DATABASE CONNECTION ERROR:"
+            );
+
+            console.error(
                 error
             );
 
-
         }
-
 
     }
 );

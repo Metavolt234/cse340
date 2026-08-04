@@ -1,127 +1,349 @@
 import {
-    getAllCategories,
-    getCategoryById,
-    getProjectsByCategory,
-    createCategory,
-    updateCategory
+getAllCategories,
+getCategoryById,
+getProjectsByCategory,
+createCategory,
+updateCategory
 } from "../models/categories.js";
 
 /**
- * Display all categories
- */
-const buildCategoryList = async (req, res) => {
-    const categories = await getAllCategories();
 
-    res.render("categories", {
-        title: "Categories",
-        categories
-    });
-};
+* Display all categories
+  */
+  const buildCategoryList = async (req, res) => {
 
-/**
- * Display category details
- */
-const buildCategoryDetail = async (req, res) => {
+  try {
 
-    const categoryId = req.params.id;
+  ```
+   const categories = await getAllCategories();
 
-    const category = await getCategoryById(categoryId);
+   res.render("categories", {
+       title: "Categories",
+       categories
+   });
+  ```
 
-    const projects = await getProjectsByCategory(categoryId);
+  } catch (error) {
 
-    res.render("category-details", {
-        title: category.name,
-        category,
-        projects
-    });
-};
+  ```
+   console.error("Error loading categories:", error);
 
-/**
- * Build Create Category View
- */
-const buildNewCategory = (req, res) => {
+   res.status(500).render("500", {
+       title: "500 - Server Error"
+   });
+  ```
 
-    res.render("new-category", {
-        title: "Create Category",
-        errors: [],
-        categoryName: ""
-    });
+  }
 
 };
 
 /**
- * Save Category
- */
-const addCategory = async (req, res) => {
 
-    const { categoryName } = req.body;
+* Display category details
+  */
+  const buildCategoryDetail = async (req, res) => {
 
-    if (!categoryName || categoryName.trim().length < 3 || categoryName.length > 100) {
+  try {
 
-        return res.render("new-category", {
-            title: "Create Category",
-            errors: [{
-                msg: "Category name must be between 3 and 100 characters."
-            }],
-            categoryName
-        });
+  ```
+   const categoryId = req.params.id;
 
-    }
+   const category = await getCategoryById(categoryId);
 
-    await createCategory(categoryName);
+   if (!category) {
 
-    res.redirect("/categories");
+       return res.status(404).render("404", {
+           title: "Category Not Found"
+       });
+
+   }
+
+   const projects = await getProjectsByCategory(categoryId);
+
+   res.render("category-details", {
+       title: category.name,
+       category,
+       projects
+   });
+  ```
+
+  } catch (error) {
+
+  ```
+   console.error("Error loading category details:", error);
+
+   res.status(500).render("500", {
+       title: "500 - Server Error"
+   });
+  ```
+
+  }
 
 };
 
 /**
- * Build Edit Category View
- */
-const buildEditCategory = async (req, res) => {
 
-    const category = await getCategoryById(req.params.id);
+* Build Create Category View
+  */
+  const buildNewCategory = (req, res) => {
 
-    res.render("edit-category", {
-        title: "Edit Category",
-        errors: [],
-        category
-    });
+  res.render("new-category", {
+  title: "Create Category",
+  errors: [],
+  categoryName: ""
+  });
 
 };
 
 /**
- * Update Category
- */
-const editCategory = async (req, res) => {
 
-    const { categoryName } = req.body;
+* Save Category
+  */
+  const addCategory = async (req, res) => {
 
-    if (!categoryName || categoryName.trim().length < 3 || categoryName.length > 100) {
+  const { categoryName } = req.body;
 
-        return res.render("edit-category", {
-            title: "Edit Category",
-            errors: [{
-                msg: "Category name must be between 3 and 100 characters."
-            }],
-            category: {
-                category_id: req.params.id,
-                name: categoryName
-            }
-        });
+  const cleanCategoryName = categoryName
+  ? categoryName.trim()
+  : "";
 
-    }
+  // Validate category name
+  if (
+  !cleanCategoryName ||
+  cleanCategoryName.length < 3 ||
+  cleanCategoryName.length > 100
+  ) {
 
-    await updateCategory(req.params.id, categoryName);
+  ```
+   return res.render("new-category", {
 
-    res.redirect("/categories");
+       title: "Create Category",
+
+       errors: [
+           {
+               msg: "Category name must be between 3 and 100 characters."
+           }
+       ],
+
+       categoryName: cleanCategoryName
+
+   });
+  ```
+
+  }
+
+  try {
+
+  ```
+   await createCategory(cleanCategoryName);
+
+
+   // Success flash message
+   if (req.flash) {
+
+       req.flash(
+           "success",
+           "Category created successfully."
+       );
+
+   }
+
+
+   res.redirect("/categories");
+  ```
+
+  } catch (error) {
+
+  ```
+   console.error("Error creating category:", error);
+
+
+   // Duplicate category
+   if (error.code === "23505") {
+
+       return res.render("new-category", {
+
+           title: "Create Category",
+
+           errors: [
+               {
+                   msg: "A category with this name already exists."
+               }
+           ],
+
+           categoryName: cleanCategoryName
+
+       });
+
+   }
+
+
+   res.status(500).render("500", {
+       title: "500 - Server Error"
+   });
+  ```
+
+  }
+
+};
+
+/**
+
+* Build Edit Category View
+  */
+  const buildEditCategory = async (req, res) => {
+
+  try {
+
+  ```
+   const category = await getCategoryById(req.params.id);
+
+
+   if (!category) {
+
+       return res.status(404).render("404", {
+           title: "Category Not Found"
+       });
+
+   }
+
+
+   res.render("edit-category", {
+
+       title: "Edit Category",
+
+       errors: [],
+
+       category
+
+   });
+  ```
+
+  } catch (error) {
+
+  ```
+   console.error("Error loading edit category page:", error);
+
+   res.status(500).render("500", {
+       title: "500 - Server Error"
+   });
+  ```
+
+  }
+
+};
+
+/**
+
+* Update Category
+  */
+  const editCategory = async (req, res) => {
+
+  const { categoryName } = req.body;
+
+  const cleanCategoryName = categoryName
+  ? categoryName.trim()
+  : "";
+
+  // Validate category name
+  if (
+  !cleanCategoryName ||
+  cleanCategoryName.length < 3 ||
+  cleanCategoryName.length > 100
+  ) {
+
+  ```
+   return res.render("edit-category", {
+
+       title: "Edit Category",
+
+       errors: [
+           {
+               msg: "Category name must be between 3 and 100 characters."
+           }
+       ],
+
+       category: {
+
+           category_id: req.params.id,
+
+           name: cleanCategoryName
+
+       }
+
+   });
+  ```
+
+  }
+
+  try {
+
+  ```
+   await updateCategory(
+       req.params.id,
+       cleanCategoryName
+   );
+
+
+   // Success flash message
+   if (req.flash) {
+
+       req.flash(
+           "success",
+           "Category updated successfully."
+       );
+
+   }
+
+
+   res.redirect("/categories");
+  ```
+
+  } catch (error) {
+
+  ```
+   console.error("Error updating category:", error);
+
+
+   if (error.code === "23505") {
+
+       return res.render("edit-category", {
+
+           title: "Edit Category",
+
+           errors: [
+               {
+                   msg: "A category with this name already exists."
+               }
+           ],
+
+           category: {
+
+               category_id: req.params.id,
+
+               name: cleanCategoryName
+
+           }
+
+       });
+
+   }
+
+
+   res.status(500).render("500", {
+       title: "500 - Server Error"
+   });
+  ```
+
+  }
 
 };
 
 export {
-    buildCategoryList,
-    buildCategoryDetail,
-    buildNewCategory,
-    addCategory,
-    buildEditCategory,
-    editCategory
+buildCategoryList,
+buildCategoryDetail,
+buildNewCategory,
+addCategory,
+buildEditCategory,
+editCategory
 };

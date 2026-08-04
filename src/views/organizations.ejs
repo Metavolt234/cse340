@@ -1,33 +1,201 @@
-<%- include('partials/header') %>
 
-<main>
+<%- include("partials/header") %>
 
-    <h1><%= title %></h1>
 
-    <p>Here are a few of our partner organizations:</p>
+<main class="page-shell">
 
-    <ul>
 
-        <% organizations.forEach(organization => { %>
+    <!-- =========================================
+         PAGE HEADER
+    ========================================== -->
 
-            <li>
+    <section class="page-heading">
 
-                <img src="/images/<%= organization.logo_filename %>" alt="<%= organization.name %> logo">
+        <span class="eyebrow">
+            SERVICE NETWORK
+        </span>
 
-                <strong>
-                    <a href="/organizations/<%= organization.organization_id %>">
-                        <%= organization.name %>
+        <h1>
+            Organizations
+        </h1>
+
+        <p>
+            Explore organizations that are making
+            a difference through community service.
+        </p>
+
+
+        <!-- Admin Add Button -->
+
+        <% if (user && user.role_name === "admin") { %>
+
+            <a
+                class="action-link primary"
+                href="/organizations/new-organization">
+
+                + Add Organization
+
+            </a>
+
+        <% } %>
+
+    </section>
+
+
+
+    <!-- =========================================
+         ORGANIZATION LIST
+    ========================================== -->
+
+    <section class="card-grid">
+
+
+        <% if (organizations && organizations.length > 0) { %>
+
+
+            <% organizations.forEach(organization => { %>
+
+
+                <article class="content-card">
+
+
+                    <!-- Organization Logo -->
+
+                    <% if (organization.logo_filename) { %>
+
+                        <img
+                            src="/images/<%= organization.logo_filename %>"
+                            alt="<%= organization.name %> logo"
+                            class="organization-logo">
+
+                    <% } %>
+
+
+
+                    <div class="card-content">
+
+
+                        <!-- Organization Name -->
+
+                        <h2>
+
+                            <a
+                                href="/organizations/<%= organization.organization_id %>">
+
+                                <%= organization.name %>
+
+                            </a>
+
+                        </h2>
+
+
+
+                        <!-- Description -->
+
+                        <p>
+                            <%= organization.description %>
+                        </p>
+
+
+
+                        <!-- Contact -->
+
+                        <p class="contact-line">
+
+                            <strong>
+                                Contact:
+                            </strong>
+
+                            <%= organization.contact_email %>
+
+                        </p>
+
+
+
+                        <!-- Buttons -->
+
+                        <div class="button-row">
+
+
+                            <!-- Details -->
+
+                            <a
+                                class="action-link secondary"
+                                href="/organizations/<%= organization.organization_id %>">
+
+                                View Details
+
+                            </a>
+
+
+
+                            <!-- Admin Edit -->
+
+                            <% if (user && user.role_name === "admin") { %>
+
+                                <a
+                                    class="action-link primary"
+                                    href="/organizations/edit-organization/<%= organization.organization_id %>">
+
+                                    Edit
+
+                                </a>
+
+                            <% } %>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                </article>
+
+
+            <% }) %>
+
+
+        <% } else { %>
+
+
+            <!-- No organizations -->
+
+            <div class="empty-state">
+
+                <h2>
+                    No Organizations Found
+                </h2>
+
+                <p>
+                    There are currently no organizations
+                    registered in the service network.
+                </p>
+
+
+                <% if (user && user.role_name === "admin") { %>
+
+                    <a
+                        class="action-link primary"
+                        href="/organizations/new-organization">
+
+                        Add the First Organization
+
                     </a>
-                </strong>
 
-                : <%= organization.contact_email %>
+                <% } %>
 
-            </li>
+            </div>
 
-        <% }); %>
 
-    </ul>
+        <% } %>
+
+
+    </section>
+
 
 </main>
 
-<%- include('partials/footer') %>
+
+<%- include("partials/footer") %>
+

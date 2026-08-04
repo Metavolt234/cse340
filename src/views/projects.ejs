@@ -1,32 +1,164 @@
 <%- include('partials/header') %>
 
-<main>
+<main class="page-container">
+  
+<section class="page-hero">
+    <div>
+        <span class="page-label">SERVICE NETWORK</span>
 
-    <h1><%= title %></h1>
+        <h1><%= title %></h1>
 
-    <h2>Upcoming Service Projects</h2>
+        <p>
+            Discover service projects and find opportunities
+            to make a positive difference in your community.
+        </p>
+    </div>
+</section>
 
-    <ul>
 
-        <% projects.forEach(project => { %>
+<section class="content-section">
 
-            <li>
+    <div class="section-heading">
 
-                <a href="/projects/<%= project.project_id %>">
+        <div>
+            <h2>Service Projects</h2>
 
-                    <%= project.name %>
+            <p>
+                Explore current and upcoming volunteer
+                opportunities.
+            </p>
+        </div>
 
-                </a>
+        <% if (typeof isLoggedIn !== 'undefined' && isLoggedIn) { %>
 
-                <br>
+            <a href="/projects" class="btn btn-primary">
+                View Projects
+            </a>
 
-                <%= project.description %>
+        <% } %>
 
-            </li>
+    </div>
 
-        <% }) %>
 
-    </ul>
+    <% if (projects && projects.length > 0) { %>
+
+        <div class="project-grid">
+
+            <% projects.forEach(project => { %>
+
+                <article class="project-card">
+
+                    <div class="project-card-header">
+
+                        <span class="project-status">
+                            Service Opportunity
+                        </span>
+
+                        <div class="project-icon">
+                            🤝
+                        </div>
+
+                    </div>
+
+
+                    <div class="project-card-body">
+
+                        <h3>
+                            <%= project.name %>
+                        </h3>
+
+
+                        <% if (project.description) { %>
+
+                            <p>
+                                <%= project.description %>
+                            </p>
+
+                        <% } else { %>
+
+                            <p>
+                                Join this community service
+                                opportunity and make a difference.
+                            </p>
+
+                        <% } %>
+
+
+                        <% if (project.organization_name) { %>
+
+                            <div class="project-detail">
+
+                                <strong>Organization:</strong>
+
+                                <span>
+                                    <%= project.organization_name %>
+                                </span>
+
+                            </div>
+
+                        <% } %>
+
+
+                        <% if (project.category_name) { %>
+
+                            <div class="project-detail">
+
+                                <strong>Category:</strong>
+
+                                <span>
+                                    <%= project.category_name %>
+                                </span>
+
+                            </div>
+
+                        <% } %>
+
+                    </div>
+
+
+                    <div class="project-card-footer">
+
+                        <a
+                            href="/projects"
+                            class="btn btn-outline"
+                        >
+                            View Project
+                        </a>
+
+                    </div>
+
+                </article>
+
+            <% }) %>
+
+        </div>
+
+
+    <% } else { %>
+
+
+        <div class="empty-state">
+
+            <div class="empty-icon">
+                🤝
+            </div>
+
+            <h3>
+                No Service Projects Available
+            </h3>
+
+            <p>
+                There are currently no service projects
+                available. Please check again later.
+            </p>
+
+        </div>
+
+
+    <% } %>
+
+</section>
+
 
 </main>
 

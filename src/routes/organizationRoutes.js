@@ -2,7 +2,21 @@ import express from "express";
 
 const router = express.Router();
 
-import * as organizationController from "../controllers/organizationController.js";
+import * as organizationController
+    from "../controllers/organizationController.js";
+
+import {
+    requireLogin,
+    requireRole
+} from "../controllers/users.js";
+
+
+
+/**
+ * =========================================
+ * PUBLIC ORGANIZATION ROUTES
+ * =========================================
+ */
 
 
 /**
@@ -16,11 +30,31 @@ router.get(
 
 
 /**
- * Create Organization
+ * Organization Details
+ * GET /organizations/:id
+ */
+router.get(
+    "/:id",
+    organizationController.buildOrganizationDetail
+);
+
+
+
+/**
+ * =========================================
+ * ADMIN ORGANIZATION ROUTES
+ * =========================================
+ */
+
+
+/**
+ * Create Organization Form
  * GET /organizations/new-organization
  */
 router.get(
     "/new-organization",
+    requireLogin,
+    requireRole("admin"),
     organizationController.buildNewOrganization
 );
 
@@ -31,16 +65,20 @@ router.get(
  */
 router.post(
     "/new-organization",
+    requireLogin,
+    requireRole("admin"),
     organizationController.addOrganization
 );
 
 
 /**
- * Edit Organization
+ * Edit Organization Form
  * GET /organizations/edit-organization/:id
  */
 router.get(
     "/edit-organization/:id",
+    requireLogin,
+    requireRole("admin"),
     organizationController.buildEditOrganization
 );
 
@@ -51,18 +89,11 @@ router.get(
  */
 router.post(
     "/edit-organization/:id",
+    requireLogin,
+    requireRole("admin"),
     organizationController.editOrganization
 );
 
 
-/**
- * Organization Details
- * GET /organizations/:id
- */
-router.get(
-    "/:id",
-    organizationController.buildOrganizationDetail
-);
-
-
 export default router;
+

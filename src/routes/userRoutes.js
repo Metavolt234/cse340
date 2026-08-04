@@ -3,94 +3,89 @@ import express from "express";
 
 import {
 
+    showUserRegistrationForm,
 
-showUserRegistrationForm,
+    processUserRegistrationForm,
 
-processUserRegistrationForm,
+    showLoginForm,
 
-showLoginForm,
+    processLoginForm,
 
-processLoginForm,
+    processLogout,
 
-processLogout,
+    requireLogin,
 
-requireLogin,
+    requireRole,
 
-requireRole,
+    showDashboard,
 
-showDashboard,
-
-showUsers
-
+    showUsers
 
 } from "../controllers/users.js";
 
 
-
-const router = express.Router();
-
-
+const router =
+    express.Router();
 
 
+
+/* Registration */
 
 router.get(
-"/register",
-showUserRegistrationForm
+    "/register",
+    showUserRegistrationForm
 );
 
 
 router.post(
-"/register",
-processUserRegistrationForm
+    "/register",
+    processUserRegistrationForm
 );
 
 
 
-
+/* Login */
 
 router.get(
-"/login",
-showLoginForm
+    "/login",
+    showLoginForm
 );
 
 
 router.post(
-"/login",
-processLoginForm
+    "/login",
+    processLoginForm
 );
 
 
 
-
+/* Logout */
 
 router.get(
-"/logout",
-processLogout
+    "/logout",
+    processLogout
 );
 
 
 
-
+/* Dashboard */
 
 router.get(
-"/dashboard",
-requireLogin,
-showDashboard
+    "/dashboard",
+    requireLogin,
+    showDashboard
 );
 
 
 
-
+/* Admin Users */
 
 router.get(
-"/users",
-requireLogin,
-requireRole("admin"),
-showUsers
+    "/users",
+    requireLogin,
+    requireRole("admin"),
+    showUsers
 );
-
-
-
 
 
 export default router;

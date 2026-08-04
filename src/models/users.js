@@ -1,20 +1,15 @@
-import db from "./db.js";
 import bcrypt from "bcrypt";
-
+import db from "./db.js";
 
 
 /**
- * Create User
+ * =========================================
+ * CREATE NEW USER
+ * =========================================
  */
-const createUser = async (
-    name,
-    email,
-    passwordHash
-) => {
-
+const createUser = async (name, email, passwordHash) => {
 
     const sql = `
-
         INSERT INTO users
         (
             name,
@@ -22,235 +17,173 @@ const createUser = async (
             password_hash,
             role_id
         )
-
         VALUES
         (
             $1,
             $2,
             $3,
-
             (
                 SELECT role_id
                 FROM roles
                 WHERE role_name = 'user'
             )
-
         )
-
         RETURNING *;
-
     `;
 
-
-    const result = await db.query(
-        sql,
-        [
-            name,
-            email,
-            passwordHash
-        ]
-    );
-
+    const result = await db.query(sql, [
+        name,
+        email,
+        passwordHash
+    ]);
 
     return result.rows[0];
-
 };
 
 
-
-
-
-
-
-
 /**
- * Find user by email
+ * =========================================
+ * FIND USER BY EMAIL
+ * =========================================
  */
-const findUserByEmail = async(email)=>{
+const findUserByEmail = async (email) => {
 
-
-    const sql = `
-
+    const query = `
         SELECT
             u.user_id,
             u.name,
             u.email,
             u.password_hash,
+            u.role_id,
             r.role_name
-
         FROM users u
-
         JOIN roles r
-        ON u.role_id = r.role_id
-
-        WHERE email=$1;
-
+            ON u.role_id = r.role_id
+        WHERE u.email = $1
     `;
 
+    const queryParams = [email];
 
+    const result = await db.query(
+        query,
+        queryParams
+    );
 
-    const result =
-        await db.query(
-            sql,
-            [email]
-        );
-
-
-
-    if(result.rows.length === 0){
+    if (result.rows.length === 0) {
 
         return null;
 
     }
 
-
     return result.rows[0];
-
 };
 
 
-
-
-
-
-
-
 /**
- * Verify Password
+ * =========================================
+ * VERIFY PASSWORD
+ * =========================================
  */
-const verifyPassword = async(
+const verifyPassword = async (
     password,
     passwordHash
-)=>{
-
+) => {
 
     return bcrypt.compare(
         password,
         passwordHash
     );
 
-
 };
 
 
-
-
-
-
-
-
-
 /**
- * Authenticate User
+ * =========================================
+ * AUTHENTICATE USER
+ * =========================================
  */
-const authenticateUser = async(
+const authenticateUser = async (
     email,
     password
-)=>{
-
+) => {
 
     const user =
         await findUserByEmail(email);
 
 
-
-    if(!user){
+    // User does not exist
+    if (!user) {
 
         return null;
 
     }
 
 
-
-
-    const valid =
+    // Check password
+    const passwordMatches =
         await verifyPassword(
             password,
             user.password_hash
         );
 
 
-
-    if(!valid){
+    // Password is incorrect
+    if (!passwordMatches) {
 
         return null;
 
     }
 
 
+    /*
+    Remove password hash before
+    storing user in session.
+    */
 
     delete user.password_hash;
 
 
-
     return user;
 
-
 };
-
-
-
-
-
-
-
 
 
 /**
- * Get All Users
+ * =========================================
+ * GET ALL USERS
+ * =========================================
+ *
+ * Used by the admin Users page.
  */
-const getAllUsers = async()=>{
+const getAllUsers = async () => {
 
-
-    const sql = `
-
+    const query = `
         SELECT
-
+            u.user_id,
             u.name,
-
             u.email,
-
             r.role_name
-
-
         FROM users u
-
-
         JOIN roles r
-
-        ON u.role_id = r.role_id
-
-
-        ORDER BY u.name;
-
-
+            ON u.role_id = r.role_id
+        ORDER BY u.name ASC
     `;
 
-
-
-    const result =
-        await db.query(sql);
-
-
+    const result = await db.query(query);
 
     return result.rows;
-
 
 };
 
 
-
-
-
-
-
+/**
+ * =========================================
+ * EXPORTS
+ * =========================================
+ */
 
 export {
-
     createUser,
-
     authenticateUser,
-
     getAllUsers
-
 };

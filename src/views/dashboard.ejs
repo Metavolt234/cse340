@@ -1,50 +1,166 @@
-<%- include('partials/header') %>
+<%- include("partials/header") %>
 
 
-<main>
+<main class="page-shell">
 
 
-<div class="dashboard-card">
+    <section class="dashboard-header">
+
+        <span class="eyebrow">
+            MEMBER DASHBOARD
+        </span>
 
 
-<h1>
-Dashboard
-</h1>
+        <h1>
+            Welcome, <%= name %>
+        </h1>
 
 
-<h2>
-Welcome <%= name %>
-</h2>
+        <p>
+            Manage your account and access the service network.
+        </p>
 
-
-<p>
-Email:
-<strong>
-<%= email %>
-</strong>
-</p>
-
-
-
-<% if(user.role_name === "admin"){ %>
-
-<a 
-class="action-link"
-href="/users">
-
-Manage Users
-
-</a>
-
-
-<% } %>
+    </section>
 
 
 
-</div>
+    <section class="dashboard-grid">
 
+
+        <article class="dashboard-card">
+
+            <span class="dashboard-icon">
+                👤
+            </span>
+
+
+            <h2>
+                Account Information
+            </h2>
+
+
+            <p>
+                <strong>Name:</strong>
+                <%= name %>
+            </p>
+
+
+            <p>
+                <strong>Email:</strong>
+                <%= email %>
+            </p>
+
+
+            <p>
+                <strong>Role:</strong>
+                <%= user.role_name %>
+            </p>
+
+        </article>
+
+
+
+        <article class="dashboard-card">
+
+            <span class="dashboard-icon">
+                🌎
+            </span>
+
+
+            <h2>
+                Explore Service
+            </h2>
+
+
+            <p>
+                Browse organizations, projects,
+                and categories.
+            </p>
+
+
+            <a
+                class="action-link primary"
+                href="/projects">
+
+                Explore Projects
+
+            </a>
+
+        </article>
+
+
+
+        <% if (user.role_name === "admin") { %>
+
+
+            <article class="dashboard-card admin-card">
+
+                <span class="dashboard-icon">
+                    🛡️
+                </span>
+
+
+                <h2>
+                    Administrator Tools
+                </h2>
+
+
+                <p>
+                    Manage users, organizations,
+                    projects, and categories.
+                </p>
+
+
+                <div class="button-row">
+
+
+                    <a
+                        class="action-link primary"
+                        href="/users">
+
+                        Manage Users
+
+                    </a>
+
+
+                    <a
+                        class="action-link secondary"
+                        href="/organizations/new-organization">
+
+                        Add Organization
+
+                    </a>
+
+
+                    <a
+                        class="action-link secondary"
+                        href="/projects/new-project">
+
+                        Add Project
+
+                    </a>
+
+
+                    <a
+                        class="action-link secondary"
+                        href="/categories/new-category">
+
+                        Add Category
+
+                    </a>
+
+
+                </div>
+
+            </article>
+
+
+        <% } %>
+
+
+    </section>
 
 </main>
 
 
-<%- include('partials/footer') %>
+<%- include("partials/footer") %>

@@ -1,61 +1,137 @@
-<%- include('partials/header') %>
+src/views/users.ejs`
+
+```ejs
+<%- include("partials/header") %>
 
 
-<main>
+<main class="page-shell">
 
 
-<h1>
-Registered Users
-</h1>
+    <section class="page-heading">
+
+        <span class="eyebrow">
+            ADMINISTRATION
+        </span>
+
+
+        <h1>
+            Registered Users
+        </h1>
+
+
+        <p>
+            View all accounts currently registered
+            in the service network.
+        </p>
+
+    </section>
 
 
 
-<table border="1">
+    <section class="table-card">
 
 
-<tr>
-
-<th>Name</th>
-
-<th>Email</th>
-
-<th>Role</th>
-
-</tr>
+        <% if (users.length > 0) { %>
 
 
-
-<% users.forEach(user=>{ %>
-
-
-<tr>
-
-<td>
-<%= user.name %>
-</td>
+            <div class="table-wrapper">
 
 
-<td>
-<%= user.email %>
-</td>
+                <table>
 
 
-<td>
-<%= user.role_name %>
-</td>
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Name
+                            </th>
+
+                            <th>
+                                Email
+                            </th>
+
+                            <th>
+                                Role
+                            </th>
+
+                        </tr>
+
+                    </thead>
 
 
-</tr>
+
+                    <tbody>
 
 
-<% }) %>
+                        <% users.forEach(user => { %>
 
 
-</table>
+                            <tr>
 
 
+                                <td>
+                                    <strong>
+                                        <%= user.name %>
+                                    </strong>
+                                </td>
+
+
+                                <td>
+                                    <%= user.email %>
+                                </td>
+
+
+                                <td>
+
+                                    <span
+                                        class="role-badge role-<%= user.role_name %>">
+
+                                        <%= user.role_name %>
+
+                                    </span>
+
+                                </td>
+
+
+                            </tr>
+
+
+                        <% }) %>
+
+
+                    </tbody>
+
+
+                </table>
+
+
+            </div>
+
+
+        <% } else { %>
+
+
+            <div class="empty-state">
+
+                <h2>
+                    No registered users
+                </h2>
+
+                <p>
+                    No users are currently registered.
+                </p>
+
+            </div>
+
+
+        <% } %>
+
+
+    </section>
 
 </main>
 
 
-<%- include('partials/footer') %>
+<%- include("partials/footer") %>

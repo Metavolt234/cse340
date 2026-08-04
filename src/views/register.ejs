@@ -1,57 +1,138 @@
-<%- include('partials/header') %>
+
+<%- include("partials/header") %>
 
 
-<main>
-
-<div class="form-container">
+<main class="page-shell narrow-page">
 
 
-<h1>
-Create Account
-</h1>
+    <section class="auth-card">
 
 
-<form action="/register" method="POST">
+        <div class="auth-header">
+
+            <span class="auth-icon">
+                👤
+            </span>
 
 
-<label>Name</label>
-
-<input 
-type="text"
-name="name"
-required
->
+            <span class="eyebrow">
+                JOIN THE NETWORK
+            </span>
 
 
-<label>Email</label>
-
-<input
-type="email"
-name="email"
-required
->
+            <h1>
+                Create Your Account
+            </h1>
 
 
-<label>Password</label>
+            <p>
+                Register to access the CSE 340 Service Network.
+            </p>
 
-<input
-type="password"
-name="password"
-required
->
+        </div>
 
 
-<button type="submit">
-Register
-</button>
+
+        <% if (errors && errors.length > 0) { %>
+
+            <div class="errors">
+
+                <% errors.forEach(error => { %>
+
+                    <p>
+                        <%= error.msg %>
+                    </p>
+
+                <% }) %>
+
+            </div>
+
+        <% } %>
 
 
-</form>
+
+        <form
+            action="/register"
+            method="POST"
+            class="auth-form">
 
 
-</div>
+            <label for="name">
+                Full Name
+            </label>
+
+
+            <input
+                type="text"
+                id="name"
+                name="name"
+                value="<%= user.name || '' %>"
+                placeholder="Enter your full name"
+                required
+                minlength="2"
+                autocomplete="name">
+
+
+
+            <label for="email">
+                Email Address
+            </label>
+
+
+            <input
+                type="email"
+                id="email"
+                name="email"
+                value="<%= user.email || '' %>"
+                placeholder="you@example.com"
+                required
+                autocomplete="email">
+
+
+
+            <label for="password">
+                Password
+            </label>
+
+
+            <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="At least 6 characters"
+                minlength="6"
+                required
+                autocomplete="new-password">
+
+
+
+            <button
+                class="submit-button"
+                type="submit">
+
+                Create Account
+
+            </button>
+
+
+        </form>
+
+
+
+        <p class="auth-footer">
+
+            Already have an account?
+
+            <a href="/login">
+                Log in here
+            </a>
+
+        </p>
+
+
+    </section>
 
 </main>
 
 
-<%- include('partials/footer') %>
+<%- include("partials/footer") %>

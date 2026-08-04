@@ -1,53 +1,118 @@
-<%- include('partials/header') %>
+<%- include("partials/header") %>
 
 
-<main>
+<main class="page-shell narrow-page">
 
 
-<div class="form-container">
+    <section class="auth-card">
 
 
-<h1>
-Login
-</h1>
+        <div class="auth-header">
+
+            <span class="auth-icon">
+                🔐
+            </span>
+
+
+            <span class="eyebrow">
+                MEMBER LOGIN
+            </span>
+
+
+            <h1>
+                Welcome Back
+            </h1>
+
+
+            <p>
+                Sign in to continue to your dashboard.
+            </p>
+
+        </div>
 
 
 
-<form action="/login" method="POST">
+        <% if (errors && errors.length > 0) { %>
+
+            <div class="errors">
+
+                <% errors.forEach(error => { %>
+
+                    <p>
+                        <%= error.msg %>
+                    </p>
+
+                <% }) %>
+
+            </div>
+
+        <% } %>
 
 
-<label>Email</label>
 
-<input
-type="email"
-name="email"
-required
->
+        <form
+            action="/login"
+            method="POST"
+            class="auth-form">
 
 
-
-<label>Password</label>
-
-<input
-type="password"
-name="password"
-required
->
+            <label for="email">
+                Email Address
+            </label>
 
 
-<button type="submit">
-Login
-</button>
+            <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="you@example.com"
+                required
+                autocomplete="email">
 
 
-</form>
+
+            <label for="password">
+                Password
+            </label>
 
 
-</div>
+            <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Enter your password"
+                required
+                autocomplete="current-password">
 
+
+
+            <button
+                class="submit-button"
+                type="submit">
+
+                Sign In
+
+            </button>
+
+
+        </form>
+
+
+
+        <p class="auth-footer">
+
+            Don't have an account?
+
+            <a href="/register">
+                Create one here
+            </a>
+
+        </p>
+
+
+    </section>
 
 </main>
 
 
-
-<%- include('partials/footer') %>
+<%- include("partials/footer") %>
