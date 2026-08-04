@@ -717,3 +717,116 @@ footer p {
     }
 
 }
+
+/* =====================================
+   CATEGORY ACTIONS
+===================================== */
+
+.category-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 25px;
+}
+
+
+/* Add Category Button */
+
+.add-category-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    background: linear-gradient(
+        135deg,
+        #2563eb,
+        #1e40af
+    );
+
+    color: #ffffff;
+
+    padding: 13px 22px;
+
+    border-radius: 9px;
+
+    text-decoration: none;
+
+    font-size: 16px;
+
+    font-weight: 700;
+
+    box-shadow:
+        0 4px 10px rgba(30, 64, 175, 0.25);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+
+/* Hover */
+
+.add-category-button:hover {
+
+    background: linear-gradient(
+        135deg,
+        #1e40af,
+        #1e3a8a
+    );
+
+    color: #ffffff;
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 7px 16px rgba(30, 64, 175, 0.35);
+
+}
+
+
+/* Click */
+
+.add-category-button:active {
+
+    transform: translateY(0);
+
+    box-shadow:
+        0 3px 8px rgba(30, 64, 175, 0.25);
+
+}
+
+
+/* Plus icon */
+
+.add-category-button::before {
+
+    content: "+";
+
+    font-size: 20px;
+
+    font-weight: 800;
+
+    margin-right: 8px;
+
+}
+
+
+/* Mobile */
+
+@media (max-width: 700px) {
+
+    .category-actions {
+
+        justify-content: center;
+
+    }
+
+    .add-category-button {
+
+        width: 100%;
+
+        max-width: 300px;
+
+    }
+
+}
