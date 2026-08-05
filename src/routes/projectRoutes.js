@@ -1,5 +1,7 @@
 import express from "express";
 
+const router = express.Router();
+
 import * as projectController
     from "../controllers/projectController.js";
 
@@ -9,21 +11,9 @@ import {
 } from "../controllers/users.js";
 
 
-const router = express.Router();
-
-
-/*
-=========================================
-PUBLIC PROJECT ROUTES
-=========================================
-*/
-
-
 /**
  * Project List
  * GET /projects
- *
- * Public - anyone can view projects
  */
 router.get(
     "/",
@@ -32,34 +22,8 @@ router.get(
 
 
 /**
- * Project Details
- * GET /projects/:id
- *
- * Public - anyone can view project details
- *
- * IMPORTANT:
- * This route is placed after /new-project
- * and /edit-project/:id so those routes
- * are matched correctly.
- */
-router.get(
-    "/:id",
-    projectController.buildProjectDetail
-);
-
-
-/*
-=========================================
-ADMIN PROJECT ROUTES
-=========================================
-*/
-
-
-/**
- * Create Project
+ * Create Project Form
  * GET /projects/new-project
- *
- * Admin only
  */
 router.get(
     "/new-project",
@@ -72,8 +36,6 @@ router.get(
 /**
  * Process Create Project
  * POST /projects/new-project
- *
- * Admin only
  */
 router.post(
     "/new-project",
@@ -84,10 +46,8 @@ router.post(
 
 
 /**
- * Edit Project
+ * Edit Project Form
  * GET /projects/edit-project/:id
- *
- * Admin only
  */
 router.get(
     "/edit-project/:id",
@@ -100,14 +60,24 @@ router.get(
 /**
  * Process Edit Project
  * POST /projects/edit-project/:id
- *
- * Admin only
  */
 router.post(
     "/edit-project/:id",
     requireLogin,
     requireRole("admin"),
     projectController.editProject
+);
+
+
+/**
+ * Project Details
+ *
+ * IMPORTANT:
+ * Keep this AFTER the named routes.
+ */
+router.get(
+    "/:id",
+    projectController.buildProjectDetail
 );
 
 

@@ -11,14 +11,6 @@ import {
 } from "../controllers/users.js";
 
 
-
-/**
- * =========================================
- * PUBLIC ORGANIZATION ROUTES
- * =========================================
- */
-
-
 /**
  * Organization List
  * GET /organizations
@@ -27,24 +19,6 @@ router.get(
     "/",
     organizationController.buildOrganizationList
 );
-
-
-/**
- * Organization Details
- * GET /organizations/:id
- */
-router.get(
-    "/:id",
-    organizationController.buildOrganizationDetail
-);
-
-
-
-/**
- * =========================================
- * ADMIN ORGANIZATION ROUTES
- * =========================================
- */
 
 
 /**
@@ -95,5 +69,17 @@ router.post(
 );
 
 
-export default router;
+/**
+ * Organization Details
+ *
+ * IMPORTANT:
+ * This route must remain AFTER
+ * all named routes above.
+ */
+router.get(
+    "/:id",
+    organizationController.buildOrganizationDetail
+);
 
+
+export default router;

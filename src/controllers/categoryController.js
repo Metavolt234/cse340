@@ -1,349 +1,498 @@
 import {
-getAllCategories,
-getCategoryById,
-getProjectsByCategory,
-createCategory,
-updateCategory
+    getAllCategories,
+    getCategoryById,
+    getProjectsByCategory,
+    createCategory,
+    updateCategory
 } from "../models/categories.js";
 
-/**
 
-* Display all categories
-  */
-  const buildCategoryList = async (req, res) => {
+/* =========================================
+   CATEGORY LIST
+========================================= */
 
-  try {
+const buildCategoryList = async (
+    req,
+    res,
+    next
+) => {
 
-  ```
-   const categories = await getAllCategories();
+    try {
 
-   res.render("categories", {
-       title: "Categories",
-       categories
-   });
-  ```
+        console.log("CATEGORY LIST: Loading categories...");
 
-  } catch (error) {
+        const categories =
+            await getAllCategories();
 
-  ```
-   console.error("Error loading categories:", error);
 
-   res.status(500).render("500", {
-       title: "500 - Server Error"
-   });
-  ```
+        console.log(
+            "CATEGORY LIST: Categories loaded:",
+            categories
+        );
 
-  }
 
-};
+        return res.render(
+            "categories",
+            {
+                title: "Categories",
+                categories: categories || []
+            }
+        );
 
-/**
 
-* Display category details
-  */
-  const buildCategoryDetail = async (req, res) => {
+    } catch (error) {
 
-  try {
+        console.error(
+            "================================="
+        );
 
-  ```
-   const categoryId = req.params.id;
+        console.error(
+            "CATEGORY LIST ERROR"
+        );
 
-   const category = await getCategoryById(categoryId);
+        console.error(
+            "================================="
+        );
 
-   if (!category) {
+        console.error(error);
 
-       return res.status(404).render("404", {
-           title: "Category Not Found"
-       });
+        return next(error);
 
-   }
-
-   const projects = await getProjectsByCategory(categoryId);
-
-   res.render("category-details", {
-       title: category.name,
-       category,
-       projects
-   });
-  ```
-
-  } catch (error) {
-
-  ```
-   console.error("Error loading category details:", error);
-
-   res.status(500).render("500", {
-       title: "500 - Server Error"
-   });
-  ```
-
-  }
+    }
 
 };
 
-/**
-
-* Build Create Category View
-  */
-  const buildNewCategory = (req, res) => {
-
-  res.render("new-category", {
-  title: "Create Category",
-  errors: [],
-  categoryName: ""
-  });
-
-};
-
-/**
-
-* Save Category
-  */
-  const addCategory = async (req, res) => {
-
-  const { categoryName } = req.body;
-
-  const cleanCategoryName = categoryName
-  ? categoryName.trim()
-  : "";
-
-  // Validate category name
-  if (
-  !cleanCategoryName ||
-  cleanCategoryName.length < 3 ||
-  cleanCategoryName.length > 100
-  ) {
-
-  ```
-   return res.render("new-category", {
-
-       title: "Create Category",
-
-       errors: [
-           {
-               msg: "Category name must be between 3 and 100 characters."
-           }
-       ],
-
-       categoryName: cleanCategoryName
-
-   });
-  ```
-
-  }
-
-  try {
-
-  ```
-   await createCategory(cleanCategoryName);
 
 
-   // Success flash message
-   if (req.flash) {
+/* =========================================
+   CATEGORY DETAILS
+========================================= */
 
-       req.flash(
-           "success",
-           "Category created successfully."
-       );
+const buildCategoryDetail = async (
+    req,
+    res,
+    next
+) => {
 
-   }
+    try {
 
-
-   res.redirect("/categories");
-  ```
-
-  } catch (error) {
-
-  ```
-   console.error("Error creating category:", error);
+        const categoryId =
+            req.params.id;
 
 
-   // Duplicate category
-   if (error.code === "23505") {
-
-       return res.render("new-category", {
-
-           title: "Create Category",
-
-           errors: [
-               {
-                   msg: "A category with this name already exists."
-               }
-           ],
-
-           categoryName: cleanCategoryName
-
-       });
-
-   }
+        console.log(
+            "CATEGORY DETAIL ID:",
+            categoryId
+        );
 
 
-   res.status(500).render("500", {
-       title: "500 - Server Error"
-   });
-  ```
+        /*
+         * Make sure the ID is numeric.
+         */
+        if (!/^\d+$/.test(categoryId)) {
 
-  }
+            return res.status(404).render(
+                "404",
+                {
+                    title: "Category Not Found"
+                }
+            );
+
+        }
+
+
+        const category =
+            await getCategoryById(
+                Number(categoryId)
+            );
+
+
+        if (!category) {
+
+            return res.status(404).render(
+                "404",
+                {
+                    title: "Category Not Found"
+                }
+            );
+
+        }
+
+
+        const projects =
+            await getProjectsByCategory(
+                Number(categoryId)
+            );
+
+
+        return res.render(
+            "category-details",
+            {
+                title: category.name,
+                category,
+                projects: projects || []
+            }
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "CATEGORY DETAIL ERROR:"
+        );
+
+        console.error(error);
+
+        return next(error);
+
+    }
 
 };
 
-/**
-
-* Build Edit Category View
-  */
-  const buildEditCategory = async (req, res) => {
-
-  try {
-
-  ```
-   const category = await getCategoryById(req.params.id);
 
 
-   if (!category) {
+/* =========================================
+   NEW CATEGORY FORM
+========================================= */
 
-       return res.status(404).render("404", {
-           title: "Category Not Found"
-       });
+const buildNewCategory = (
+    req,
+    res
+) => {
 
-   }
-
-
-   res.render("edit-category", {
-
-       title: "Edit Category",
-
-       errors: [],
-
-       category
-
-   });
-  ```
-
-  } catch (error) {
-
-  ```
-   console.error("Error loading edit category page:", error);
-
-   res.status(500).render("500", {
-       title: "500 - Server Error"
-   });
-  ```
-
-  }
+    return res.render(
+        "new-category",
+        {
+            title: "Create Category",
+            errors: [],
+            categoryName: ""
+        }
+    );
 
 };
 
-/**
-
-* Update Category
-  */
-  const editCategory = async (req, res) => {
-
-  const { categoryName } = req.body;
-
-  const cleanCategoryName = categoryName
-  ? categoryName.trim()
-  : "";
-
-  // Validate category name
-  if (
-  !cleanCategoryName ||
-  cleanCategoryName.length < 3 ||
-  cleanCategoryName.length > 100
-  ) {
-
-  ```
-   return res.render("edit-category", {
-
-       title: "Edit Category",
-
-       errors: [
-           {
-               msg: "Category name must be between 3 and 100 characters."
-           }
-       ],
-
-       category: {
-
-           category_id: req.params.id,
-
-           name: cleanCategoryName
-
-       }
-
-   });
-  ```
-
-  }
-
-  try {
-
-  ```
-   await updateCategory(
-       req.params.id,
-       cleanCategoryName
-   );
 
 
-   // Success flash message
-   if (req.flash) {
+/* =========================================
+   CREATE CATEGORY
+========================================= */
 
-       req.flash(
-           "success",
-           "Category updated successfully."
-       );
+const addCategory = async (
+    req,
+    res,
+    next
+) => {
 
-   }
+    try {
 
-
-   res.redirect("/categories");
-  ```
-
-  } catch (error) {
-
-  ```
-   console.error("Error updating category:", error);
+        const categoryName =
+            req.body.categoryName
+                ?.trim();
 
 
-   if (error.code === "23505") {
-
-       return res.render("edit-category", {
-
-           title: "Edit Category",
-
-           errors: [
-               {
-                   msg: "A category with this name already exists."
-               }
-           ],
-
-           category: {
-
-               category_id: req.params.id,
-
-               name: cleanCategoryName
-
-           }
-
-       });
-
-   }
+        const errors = [];
 
 
-   res.status(500).render("500", {
-       title: "500 - Server Error"
-   });
-  ```
+        if (
+            !categoryName ||
+            categoryName.length < 3 ||
+            categoryName.length > 100
+        ) {
 
-  }
+            errors.push({
+                msg:
+                    "Category name must be between 3 and 100 characters."
+            });
+
+        }
+
+
+        if (errors.length > 0) {
+
+            return res.render(
+                "new-category",
+                {
+                    title: "Create Category",
+                    errors,
+                    categoryName:
+                        categoryName || ""
+                }
+            );
+
+        }
+
+
+        await createCategory(
+            categoryName
+        );
+
+
+        if (req.flash) {
+
+            req.flash(
+                "success",
+                "Category created successfully."
+            );
+
+        }
+
+
+        return res.redirect(
+            "/categories"
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "CREATE CATEGORY ERROR:"
+        );
+
+        console.error(error);
+
+
+        if (
+            error.code === "23505"
+        ) {
+
+            return res.render(
+                "new-category",
+                {
+                    title: "Create Category",
+
+                    errors: [
+                        {
+                            msg:
+                                "A category with that name already exists."
+                        }
+                    ],
+
+                    categoryName:
+                        req.body.categoryName || ""
+                }
+            );
+
+        }
+
+
+        return next(error);
+
+    }
 
 };
+
+
+
+/* =========================================
+   EDIT CATEGORY FORM
+========================================= */
+
+const buildEditCategory = async (
+    req,
+    res,
+    next
+) => {
+
+    try {
+
+        const categoryId =
+            req.params.id;
+
+
+        if (!/^\d+$/.test(categoryId)) {
+
+            return res.status(404).render(
+                "404",
+                {
+                    title: "Category Not Found"
+                }
+            );
+
+        }
+
+
+        const category =
+            await getCategoryById(
+                Number(categoryId)
+            );
+
+
+        if (!category) {
+
+            return res.status(404).render(
+                "404",
+                {
+                    title: "Category Not Found"
+                }
+            );
+
+        }
+
+
+        return res.render(
+            "edit-category",
+            {
+                title: "Edit Category",
+                errors: [],
+                category
+            }
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "BUILD EDIT CATEGORY ERROR:"
+        );
+
+        console.error(error);
+
+        return next(error);
+
+    }
+
+};
+
+
+
+/* =========================================
+   UPDATE CATEGORY
+========================================= */
+
+const editCategory = async (
+    req,
+    res,
+    next
+) => {
+
+    try {
+
+        const categoryName =
+            req.body.categoryName
+                ?.trim();
+
+
+        const errors = [];
+
+
+        if (
+            !categoryName ||
+            categoryName.length < 3 ||
+            categoryName.length > 100
+        ) {
+
+            errors.push({
+                msg:
+                    "Category name must be between 3 and 100 characters."
+            });
+
+        }
+
+
+        if (errors.length > 0) {
+
+            return res.render(
+                "edit-category",
+                {
+                    title: "Edit Category",
+                    errors,
+
+                    category: {
+                        category_id:
+                            req.params.id,
+
+                        name:
+                            categoryName || ""
+                    }
+                }
+            );
+
+        }
+
+
+        await updateCategory(
+            Number(req.params.id),
+            categoryName
+        );
+
+
+        if (req.flash) {
+
+            req.flash(
+                "success",
+                "Category updated successfully."
+            );
+
+        }
+
+
+        return res.redirect(
+            "/categories"
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "UPDATE CATEGORY ERROR:"
+        );
+
+        console.error(error);
+
+
+        if (
+            error.code === "23505"
+        ) {
+
+            return res.render(
+                "edit-category",
+                {
+                    title: "Edit Category",
+
+                    errors: [
+                        {
+                            msg:
+                                "A category with that name already exists."
+                        }
+                    ],
+
+                    category: {
+                        category_id:
+                            req.params.id,
+
+                        name:
+                            req.body.categoryName || ""
+                    }
+                }
+            );
+
+        }
+
+
+        return next(error);
+
+    }
+
+};
+
+
+
+/* =========================================
+   EXPORTS
+========================================= */
 
 export {
-buildCategoryList,
-buildCategoryDetail,
-buildNewCategory,
-addCategory,
-buildEditCategory,
-editCategory
+
+    buildCategoryList,
+
+    buildCategoryDetail,
+
+    buildNewCategory,
+
+    addCategory,
+
+    buildEditCategory,
+
+    editCategory
+
 };

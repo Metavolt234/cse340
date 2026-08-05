@@ -1,91 +1,128 @@
-<%- include('partials/header') %>
+<%- include("partials/header") %>
 
-<main class="page-container">
+<main class="page-shell">
 
-```
-<section class="page-hero">
-    <div>
-        <span class="page-label">SERVICE NETWORK</span>
-        <h1><%= title %></h1>
+    <section class="page-heading">
+
+        <span class="eyebrow">
+            SERVICE NETWORK
+        </span>
+
+        <h1>
+            Service Categories
+        </h1>
+
         <p>
-            Explore service categories and discover opportunities
-            where volunteers can make a difference.
+            Explore the different areas where
+            community service projects are available.
         </p>
-    </div>
-</section>
 
-<section class="content-section">
 
-    <div class="section-heading">
-        <div>
-            <h2>Service Categories</h2>
-            <p>Browse the different areas of community service.</p>
-        </div>
+        <% if (
+            typeof isAdmin !== "undefined" &&
+            isAdmin
+        ) { %>
 
-        <% if (typeof isLoggedIn !== 'undefined' && isLoggedIn) { %>
-            <a href="/categories" class="btn btn-primary">
-                View Categories
+            <a
+                class="action-link primary"
+                href="/categories/new-category">
+
+                + Add Category
+
             </a>
+
         <% } %>
-    </div>
 
-    <% if (categories && categories.length > 0) { %>
+    </section>
 
-        <div class="card-grid">
 
-            <% categories.forEach(category => { %>
+    <section class="card-grid">
 
-                <article class="info-card">
+        <% if (
+            categories &&
+            categories.length > 0
+        ) { %>
 
-                    <div class="card-icon">
-                        <span>✓</span>
-                    </div>
+
+            <% categories.forEach(
+                category => {
+            %>
+
+                <article class="content-card">
 
                     <div class="card-content">
 
-                        <h3>
-                            <%= category.name %>
-                        </h3>
+                        <h2>
 
-                        <% if (category.description) { %>
-                            <p>
-                                <%= category.description %>
-                            </p>
-                        <% } else { %>
-                            <p>
-                                Discover service opportunities
-                                related to <%= category.name %>.
-                            </p>
-                        <% } %>
+                            <a
+                                href="/categories/<%= category.category_id %>"
+                            >
+
+                                <%= category.name %>
+
+                            </a>
+
+                        </h2>
+
+
+                        <div class="button-row">
+
+                            <a
+                                class="action-link secondary"
+                                href="/categories/<%= category.category_id %>"
+                            >
+
+                                View Projects
+
+                            </a>
+
+
+                            <% if (
+                                typeof isAdmin !== "undefined" &&
+                                isAdmin
+                            ) { %>
+
+                                <a
+                                    class="action-link primary"
+                                    href="/categories/edit-category/<%= category.category_id %>"
+                                >
+
+                                    Edit
+
+                                </a>
+
+                            <% } %>
+
+                        </div>
 
                     </div>
 
                 </article>
 
+
             <% }) %>
 
-        </div>
 
-    <% } else { %>
+        <% } else { %>
 
-        <div class="empty-state">
 
-            <div class="empty-icon">📂</div>
+            <div class="empty-state">
 
-            <h3>No Categories Available</h3>
+                <h2>
+                    No Categories Found
+                </h2>
 
-            <p>
-                There are currently no service categories
-                available in the system.
-            </p>
+                <p>
+                    There are currently no service categories.
+                </p>
 
-        </div>
+            </div>
 
-    <% } %>
 
-</section>
-```
+        <% } %>
+
+    </section>
 
 </main>
 
-<%- include('partials/footer') %>
+<%- include("partials/footer") %>

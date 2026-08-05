@@ -1,5 +1,7 @@
 import express from "express";
 
+const router = express.Router();
+
 import * as categoryController
     from "../controllers/categoryController.js";
 
@@ -9,17 +11,10 @@ import {
 } from "../controllers/users.js";
 
 
-const router = express.Router();
+/* =====================================
+   ADMIN CREATE
+===================================== */
 
-
-/*
-=========================================
-ADMIN CATEGORY ROUTES
-=========================================
-*/
-
-
-// Display Create Category Form
 router.get(
     "/new-category",
     requireLogin,
@@ -28,7 +23,6 @@ router.get(
 );
 
 
-// Process Create Category Form
 router.post(
     "/new-category",
     requireLogin,
@@ -37,7 +31,11 @@ router.post(
 );
 
 
-// Display Edit Category Form
+
+/* =====================================
+   ADMIN EDIT
+===================================== */
+
 router.get(
     "/edit-category/:id",
     requireLogin,
@@ -46,7 +44,6 @@ router.get(
 );
 
 
-// Process Edit Category Form
 router.post(
     "/edit-category/:id",
     requireLogin,
@@ -55,21 +52,22 @@ router.post(
 );
 
 
-/*
-=========================================
-PUBLIC CATEGORY ROUTES
-=========================================
-*/
 
+/* =====================================
+   PUBLIC LIST
+===================================== */
 
-// Display all categories
 router.get(
     "/",
     categoryController.buildCategoryList
 );
 
 
-// Display category details
+
+/* =====================================
+   PUBLIC DETAILS
+===================================== */
+
 router.get(
     "/:id",
     categoryController.buildCategoryDetail
