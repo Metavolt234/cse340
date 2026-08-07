@@ -1,3 +1,4 @@
+
 import bcrypt from "bcrypt";
 
 
@@ -9,15 +10,23 @@ import {
 
 
 import {
+    getProjectsByUser
+} from "../models/volunteers.js";
+
+
+import {
     setFlash
 } from "../utilities/flash.js";
 
 
 
-/* =====================================
+/* =========================================
    REGISTER
-===================================== */
+========================================= */
 
+/**
+ * Display registration form
+ */
 const showUserRegistrationForm = (
     req,
     res
@@ -36,6 +45,9 @@ const showUserRegistrationForm = (
 
 
 
+/**
+ * Process registration form
+ */
 const processUserRegistrationForm =
     async (req, res) => {
 
@@ -48,6 +60,10 @@ const processUserRegistrationForm =
 
         const errors = [];
 
+
+        /* -----------------------------
+           Validate name
+        ----------------------------- */
 
         if (
             !name ||
@@ -62,6 +78,10 @@ const processUserRegistrationForm =
         }
 
 
+        /* -----------------------------
+           Validate email
+        ----------------------------- */
+
         if (
             !email ||
             !email.includes("@")
@@ -74,6 +94,10 @@ const processUserRegistrationForm =
 
         }
 
+
+        /* -----------------------------
+           Validate password
+        ----------------------------- */
 
         if (
             !password ||
@@ -88,13 +112,19 @@ const processUserRegistrationForm =
         }
 
 
+        /* -----------------------------
+           Return validation errors
+        ----------------------------- */
+
         if (errors.length > 0) {
 
             return res.status(400).render(
                 "register",
                 {
                     title: "Create Account",
+
                     errors,
+
                     user: {
                         name,
                         email
@@ -108,6 +138,10 @@ const processUserRegistrationForm =
 
         try {
 
+            /* -----------------------------
+               Hash password
+            ----------------------------- */
+
             const passwordHash =
                 await bcrypt.hash(
                     password,
@@ -115,12 +149,20 @@ const processUserRegistrationForm =
                 );
 
 
+            /* -----------------------------
+               Create user
+            ----------------------------- */
+
             await createUser(
                 name.trim(),
                 email.trim().toLowerCase(),
                 passwordHash
             );
 
+
+            /* -----------------------------
+               Success message
+            ----------------------------- */
 
             setFlash(
                 req,
@@ -136,8 +178,15 @@ const processUserRegistrationForm =
 
         } catch (error) {
 
-            console.error(error);
+            console.error(
+                "ERROR - processUserRegistrationForm:",
+                error
+            );
 
+
+            /* -----------------------------
+               Duplicate email
+            ----------------------------- */
 
             if (
                 error.code === "23505"
@@ -157,10 +206,15 @@ const processUserRegistrationForm =
             }
 
 
+            /* -----------------------------
+               Other database errors
+            ----------------------------- */
+
             return res.status(500).render(
                 "500",
                 {
-                    title: "500 - Server Error"
+                    title:
+                        "500 - Server Error"
                 }
             );
 
@@ -170,10 +224,13 @@ const processUserRegistrationForm =
 
 
 
-/* =====================================
+/* =========================================
    LOGIN
-===================================== */
+========================================= */
 
+/**
+ * Display login form
+ */
 const showLoginForm = (
     req,
     res
@@ -191,6 +248,9 @@ const showLoginForm = (
 
 
 
+/**
+ * Process login form
+ */
 const processLoginForm =
     async (req, res) => {
 
@@ -200,7 +260,14 @@ const processLoginForm =
         } = req.body;
 
 
-        if (!email || !password) {
+        /* -----------------------------
+           Validate login fields
+        ----------------------------- */
+
+        if (
+            !email ||
+            !password
+        ) {
 
             setFlash(
                 req,
@@ -219,6 +286,10 @@ const processLoginForm =
 
         try {
 
+            /* -----------------------------
+               Authenticate user
+            ----------------------------- */
+
             const user =
                 await authenticateUser(
                     email
@@ -227,6 +298,10 @@ const processLoginForm =
                     password
                 );
 
+
+            /* -----------------------------
+               Invalid credentials
+            ----------------------------- */
 
             if (!user) {
 
@@ -243,6 +318,10 @@ const processLoginForm =
 
             }
 
+
+            /* -----------------------------
+               Save user in session
+            ----------------------------- */
 
             req.session.user =
                 user;
@@ -266,6 +345,10 @@ const processLoginForm =
             );
 
 
+            /* -----------------------------
+               Login flash message
+            ----------------------------- */
+
             setFlash(
                 req,
                 "success",
@@ -280,7 +363,10 @@ const processLoginForm =
 
         } catch (error) {
 
-            console.error(error);
+            console.error(
+                "ERROR - processLoginForm:",
+                error
+            );
 
 
             setFlash(
@@ -300,21 +386,33 @@ const processLoginForm =
 
 
 
-/* =====================================
+/* =========================================
    LOGOUT
-===================================== */
+========================================= */
 
+/**
+ * Log the user out
+ */
 const processLogout = (
     req,
     res
 ) => {
 
-    req.session.regenerate(
+    /*
+     * Store the session flash message
+     * before destroying the session.
+     */
+
+    req.session.destroy(
         (error) => {
 
             if (error) {
 
-                console.error(error);
+                console.error(
+                    "ERROR - processLogout:",
+                    error
+                );
+
 
                 return res.redirect(
                     "/login"
@@ -323,15 +421,11 @@ const processLogout = (
             }
 
 
-            setFlash(
-                req,
-                "success",
-                "You have been logged out successfully."
-            );
-
-
-            res.redirect(
-                "/login"
+            /*
+             * Redirect to login after logout.
+             */
+            return res.redirect(
+                "/login?logout=success"
             );
 
         }
@@ -341,17 +435,24 @@ const processLogout = (
 
 
 
-/* =====================================
+/* =========================================
    REQUIRE LOGIN
-===================================== */
+========================================= */
 
+/**
+ * Protect routes that require
+ * an authenticated user.
+ */
 const requireLogin = (
     req,
     res,
     next
 ) => {
 
-    if (!req.session.user) {
+    if (
+        !req.session ||
+        !req.session.user
+    ) {
 
         setFlash(
             req,
@@ -373,10 +474,17 @@ const requireLogin = (
 
 
 
-/* =====================================
+/* =========================================
    REQUIRE ROLE
-===================================== */
+========================================= */
 
+/**
+ * Protect routes based on user role.
+ *
+ * Usage:
+ *
+ * requireRole("admin")
+ */
 const requireRole = (
     role
 ) => {
@@ -387,9 +495,26 @@ const requireRole = (
         next
     ) => {
 
+        if (
+            !req.session ||
+            !req.session.user
+        ) {
+
+            setFlash(
+                req,
+                "error",
+                "Please log in to access that page."
+            );
+
+
+            return res.redirect(
+                "/login"
+            );
+
+        }
+
 
         if (
-            !req.session.user ||
             req.session.user.role_name !== role
         ) {
 
@@ -415,59 +540,167 @@ const requireRole = (
 
 
 
-/* =====================================
+/* =========================================
    DASHBOARD
-===================================== */
+========================================= */
 
-const showDashboard = (
-    req,
-    res
-) => {
-
-    const {
-        name,
-        email
-    } = req.session.user;
-
-
-    res.render(
-        "dashboard",
-        {
-            title: "Dashboard",
-            name,
-            email,
-            user:
-                req.session.user
-        }
-    );
-
-};
-
-
-
-/* =====================================
-   ADMIN USERS
-===================================== */
-
-const showUsers =
+/**
+ * Display user dashboard.
+ *
+ * Week 6:
+ * Retrieve all projects that the
+ * logged-in user has volunteered for.
+ */
+const showDashboard =
     async (req, res) => {
 
-        const users =
-            await getAllUsers();
+        try {
+
+            /* -----------------------------
+               Make sure user is logged in
+            ----------------------------- */
+
+            if (
+                !req.session ||
+                !req.session.user
+            ) {
+
+                setFlash(
+                    req,
+                    "error",
+                    "Please log in to access your dashboard."
+                );
 
 
-        res.render(
-            "users",
-            {
-                title:
-                    "Registered Users",
-                users
+                return res.redirect(
+                    "/login"
+                );
+
             }
-        );
+
+
+            const {
+                user_id,
+                name,
+                email
+            } = req.session.user;
+
+
+            /* -----------------------------
+               Get volunteer projects
+            ----------------------------- */
+
+            const volunteerProjects =
+                await getProjectsByUser(
+                    user_id
+                );
+
+
+            /* -----------------------------
+               Display dashboard
+            ----------------------------- */
+
+            return res.render(
+                "dashboard",
+                {
+
+                    title:
+                        "Dashboard",
+
+                    name,
+
+                    email,
+
+                    user:
+                        req.session.user,
+
+                    volunteerProjects
+
+                }
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "ERROR - showDashboard:",
+                error
+            );
+
+
+            return res.status(500).render(
+                "500",
+                {
+                    title:
+                        "500 - Server Error"
+                }
+            );
+
+        }
 
     };
 
 
+
+/* =========================================
+   ADMIN USERS
+========================================= */
+
+/**
+ * Display all registered users.
+ *
+ * This route should be protected with:
+ *
+ * requireLogin
+ * requireRole("admin")
+ */
+const showUsers =
+    async (req, res) => {
+
+        try {
+
+            const users =
+                await getAllUsers();
+
+
+            return res.render(
+                "users",
+                {
+
+                    title:
+                        "Registered Users",
+
+                    users
+
+                }
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "ERROR - showUsers:",
+                error
+            );
+
+
+            return res.status(500).render(
+                "500",
+                {
+                    title:
+                        "500 - Server Error"
+                }
+            );
+
+        }
+
+    };
+
+
+
+/* =========================================
+   EXPORTS
+========================================= */
 
 export {
 
@@ -490,3 +723,4 @@ export {
     showUsers
 
 };
+

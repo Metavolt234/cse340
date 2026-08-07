@@ -1,164 +1,165 @@
-<%- include('partials/header') %>
+<%- include("partials/header") %>
 
-<main class="page-container">
-<section class="page-hero">
-    <div>
-        <span class="page-label">SERVICE NETWORK</span>
+<main class="page-shell">
 
-        <h1><%= title %></h1>
+```
+<!-- =========================================
+     PROJECT PAGE HEADER
+========================================== -->
 
-        <p>
-            Discover service projects and find opportunities
-            to make a positive difference in your community.
-        </p>
-    </div>
-</section>
+<section class="page-heading">
 
+    <span class="eyebrow">
+        COMMUNITY SERVICE
+    </span>
 
-<section class="content-section">
+    <h1>
+        Service Projects
+    </h1>
 
-    <div class="section-heading">
+    <p>
+        Explore service projects and find opportunities
+        to make a difference in your community.
+    </p>
 
-        <div>
-            <h2>Service Projects</h2>
+    <% if (isAdmin) { %>
 
-            <p>
-                Explore current and upcoming volunteer
-                opportunities.
-            </p>
-        </div>
+        <div class="category-actions">
 
-        <% if (typeof isLoggedIn !== 'undefined' && isLoggedIn) { %>
+            <a
+                href="/projects/new-project"
+                class="add-category-button">
 
-            <a href="/projects" class="btn btn-primary">
-                View Projects
+                Add New Project
+
             </a>
 
-        <% } %>
-
-    </div>
-
-
-    <% if (projects && projects.length > 0) { %>
-
-        <div class="project-grid">
-
-            <% projects.forEach(project => { %>
-
-                <article class="project-card">
-
-                    <div class="project-card-header">
-
-                        <span class="project-status">
-                            Service Opportunity
-                        </span>
-
-                        <div class="project-icon">
-                            🤝
-                        </div>
-
-                    </div>
-
-
-                    <div class="project-card-body">
-
-                        <h3>
-                            <%= project.name %>
-                        </h3>
-
-
-                        <% if (project.description) { %>
-
-                            <p>
-                                <%= project.description %>
-                            </p>
-
-                        <% } else { %>
-
-                            <p>
-                                Join this community service
-                                opportunity and make a difference.
-                            </p>
-
-                        <% } %>
-
-
-                        <% if (project.organization_name) { %>
-
-                            <div class="project-detail">
-
-                                <strong>Organization:</strong>
-
-                                <span>
-                                    <%= project.organization_name %>
-                                </span>
-
-                            </div>
-
-                        <% } %>
-
-
-                        <% if (project.category_name) { %>
-
-                            <div class="project-detail">
-
-                                <strong>Category:</strong>
-
-                                <span>
-                                    <%= project.category_name %>
-                                </span>
-
-                            </div>
-
-                        <% } %>
-
-                    </div>
-
-
-                    <div class="project-card-footer">
-
-                        <a
-                            href="/projects"
-                            class="btn btn-outline"
-                        >
-                            View Project
-                        </a>
-
-                    </div>
-
-                </article>
-
-            <% }) %>
-
         </div>
-
-
-    <% } else { %>
-
-
-        <div class="empty-state">
-
-            <div class="empty-icon">
-                🤝
-            </div>
-
-            <h3>
-                No Service Projects Available
-            </h3>
-
-            <p>
-                There are currently no service projects
-                available. Please check again later.
-            </p>
-
-        </div>
-
 
     <% } %>
 
 </section>
 
 
+<!-- =========================================
+     PROJECT CARDS
+========================================== -->
+
+<% if (projects && projects.length > 0) { %>
+
+    <section class="project-grid">
+
+        <% projects.forEach(project => { %>
+
+            <article class="project-card">
+
+                <div class="project-card-content">
+
+                    <span class="project-label">
+                        SERVICE PROJECT
+                    </span>
+
+
+                    <h2 class="project-title">
+
+                        <a
+                            href="/projects/<%= project.project_id %>">
+
+                            <%= project.name %>
+
+                        </a>
+
+                    </h2>
+
+
+                    <p class="project-description">
+
+                        <%= project.description %>
+
+                    </p>
+
+
+                    <!-- PROJECT ACTIONS -->
+
+                    <div class="project-actions">
+
+                        <a
+                            href="/projects/<%= project.project_id %>"
+                            class="action-link primary">
+
+                            View Project
+
+                        </a>
+
+
+                        <a
+                            href="/projects/<%= project.project_id %>"
+                            class="action-link secondary">
+
+                            View Details
+
+                        </a>
+
+
+                        <% if (isAdmin) { %>
+
+                            <a
+                                href="/projects/edit-project/<%= project.project_id %>"
+                                class="action-link warning">
+
+                                Edit Project
+
+                            </a>
+
+                        <% } %>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+        <% }) %>
+
+    </section>
+
+
+<% } else { %>
+
+
+    <!-- =========================================
+         NO PROJECTS
+    ========================================== -->
+
+    <section class="empty-state">
+
+        <h3>
+            No Service Projects Found
+        </h3>
+
+        <p>
+            There are currently no service projects
+            available.
+        </p>
+
+
+        <% if (isAdmin) { %>
+
+            <a
+                href="/projects/new-project"
+                class="action-link primary">
+
+                Create the First Project
+
+            </a>
+
+        <% } %>
+
+    </section>
+
+<% } %>
+```
+
 </main>
 
-<%- include('partials/footer') %>
+<%- include("partials/footer") %>

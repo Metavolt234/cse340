@@ -2,79 +2,111 @@ import express from "express";
 
 const router = express.Router();
 
+
+// ========================================
+// CONTROLLERS
+// ========================================
+
 import * as projectController
     from "../controllers/projectController.js";
 
+
+// ========================================
+// AUTHENTICATION MIDDLEWARE
+// ========================================
+
 import {
-    requireLogin,
-    requireRole
-} from "../controllers/users.js";
+    requireLogin
+} from "../middleware/auth.js";
 
 
-/**
- * Project List
- * GET /projects
- */
+// ========================================
+// PROJECT LIST
+// GET /projects
+// ========================================
+
 router.get(
     "/",
     projectController.buildProjectList
 );
 
 
-/**
- * Create Project Form
- * GET /projects/new-project
- */
+// ========================================
+// NEW PROJECT FORM
+// GET /projects/new-project
+// ========================================
+
 router.get(
     "/new-project",
     requireLogin,
-    requireRole("admin"),
     projectController.buildNewProject
 );
 
 
-/**
- * Process Create Project
- * POST /projects/new-project
- */
+// ========================================
+// CREATE PROJECT
+// POST /projects/new-project
+// ========================================
+
 router.post(
     "/new-project",
     requireLogin,
-    requireRole("admin"),
     projectController.addProject
 );
 
 
-/**
- * Edit Project Form
- * GET /projects/edit-project/:id
- */
+// ========================================
+// EDIT PROJECT FORM
+// GET /projects/edit-project/:id
+// ========================================
+
 router.get(
     "/edit-project/:id",
     requireLogin,
-    requireRole("admin"),
     projectController.buildEditProject
 );
 
 
-/**
- * Process Edit Project
- * POST /projects/edit-project/:id
- */
+// ========================================
+// UPDATE PROJECT
+// POST /projects/edit-project/:id
+// ========================================
+
 router.post(
     "/edit-project/:id",
     requireLogin,
-    requireRole("admin"),
     projectController.editProject
 );
 
 
-/**
- * Project Details
- *
- * IMPORTANT:
- * Keep this AFTER the named routes.
- */
+// ========================================
+// VOLUNTEER FOR PROJECT
+// POST /projects/:id/volunteer
+// ========================================
+
+router.post(
+    "/:id/volunteer",
+    requireLogin,
+    projectController.volunteerForProject
+);
+
+
+// ========================================
+// REMOVE VOLUNTEER
+// POST /projects/:id/remove-volunteer
+// ========================================
+
+router.post(
+    "/:id/remove-volunteer",
+    requireLogin,
+    projectController.removeVolunteerFromProject
+);
+
+// ========================================
+// PROJECT DETAILS
+// GET /projects/:id
+// ========================================
+
 router.get(
     "/:id",
     projectController.buildProjectDetail

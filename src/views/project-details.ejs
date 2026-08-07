@@ -1,47 +1,225 @@
-<%- include('partials/header') %>
+<%- include("partials/header") %>
 
-<main>
+<main class="page-shell">
 
-    <h1><%= project.name %></h1>
+    <section class="page-heading">
 
-    <p>
-        <strong>Description:</strong><br>
-        <%= project.description %>
-    </p>
+        <span class="eyebrow">
+            SERVICE PROJECT
+        </span>
 
-    <p>
-        <strong>Organization:</strong>
-        <a href="/organizations/<%= project.organization_id %>">
-            <%= project.organization_name %>
-        </a>
-    </p>
+        <h1>
+            <%= project.name %>
+        </h1>
 
-    <h2>Categories</h2>
+        <p>
+            Learn more about this community service opportunity.
+        </p>
 
-    <% if (categories.length > 0) { %>
+    </section>
 
-        <ul>
 
-            <% categories.forEach(category => { %>
+    <section class="project-details-card">
 
-                <li>
+        <h2>
+            About This Project
+        </h2>
 
-                    <a href="/categories/<%= category.category_id %>">
+
+        <p class="project-detail-description">
+
+            <%= project.description %>
+
+        </p>
+
+
+        <!-- ORGANIZATION -->
+
+        <div class="organization-info">
+
+            <p>
+
+                <strong>
+                    Organization:
+                </strong>
+
+                <%= project.organization_name %>
+
+            </p>
+
+
+            <p>
+
+                <strong>
+                    Organization ID:
+                </strong>
+
+                <%= project.organization_id %>
+
+            </p>
+
+        </div>
+
+
+        <!-- CATEGORIES -->
+
+        <h3>
+            Project Categories
+        </h3>
+
+
+        <% if (categories && categories.length > 0) { %>
+
+            <div class="project-categories">
+
+                <% categories.forEach(category => { %>
+
+                    <span class="project-category">
+
                         <%= category.name %>
+
+                    </span>
+
+                <% }) %>
+
+            </div>
+
+        <% } else { %>
+
+            <p>
+                No categories have been assigned to this project.
+            </p>
+
+        <% } %>
+
+
+        <!-- VOLUNTEER -->
+
+        <% if (isLoggedIn) { %>
+
+            <div class="volunteer-section">
+
+                <% if (isVolunteer) { %>
+
+                    <div class="volunteer-status success">
+
+                        <h3>
+                            You are volunteering for this project!
+                        </h3>
+
+                        <p>
+                            Thank you for helping with this service project.
+                        </p>
+
+
+                        <form
+                            action="/projects/<%= project.project_id %>/remove-volunteer"
+                            method="POST">
+
+                            <button
+                                type="submit"
+                                class="btn btn-danger">
+
+                                Remove Me as Volunteer
+
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                <% } else { %>
+
+                    <div class="volunteer-status">
+
+                        <h3>
+                            Interested in helping?
+                        </h3>
+
+                        <p>
+                            Sign up to volunteer for this service project.
+                        </p>
+
+
+                        <form
+                            action="/projects/<%= project.project_id %>/volunteer"
+                            method="POST">
+
+                            <button
+                                type="submit"
+                                class="btn btn-success">
+
+                                Volunteer for This Project
+
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                <% } %>
+
+            </div>
+
+        <% } else { %>
+
+            <div class="volunteer-section">
+
+                <div class="volunteer-status login-required">
+
+                    <h3>
+                        Want to volunteer?
+                    </h3>
+
+                    <p>
+                        Please log in to volunteer for this project.
+                    </p>
+
+
+                    <a
+                        href="/login"
+                        class="action-link primary">
+
+                        Login to Volunteer
+
                     </a>
 
-                </li>
+                </div>
 
-            <% }) %>
+            </div>
 
-        </ul>
+        <% } %>
 
-    <% } else { %>
 
-        <p>No categories assigned.</p>
+        <!-- ACTIONS -->
 
-    <% } %>
+        <div class="button-row">
+
+            <a
+                href="/projects"
+                class="action-link secondary">
+
+                ← Back to Projects
+
+            </a>
+
+
+            <% if (isLoggedIn) { %>
+
+                <a
+                    href="/projects/edit-project/<%= project.project_id %>"
+                    class="action-link warning">
+
+                    Edit Project
+
+                </a>
+
+            <% } %>
+
+        </div>
+
+    </section>
 
 </main>
 
-<%- include('partials/footer') %>
+<%- include("partials/footer") %>

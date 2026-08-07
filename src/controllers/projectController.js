@@ -1,3 +1,4 @@
+
 import {
     getAllProjects,
     getProjectById,
@@ -10,83 +11,143 @@ import {
     getAllOrganizations
 } from "../models/organizations.js";
 
+import {
+    addVolunteer,
+    removeVolunteer,
+    isUserVolunteer
+} from "../models/volunteers.js";
 
-/**
- * Display all projects
- */
+
+/* =========================================
+   DISPLAY ALL PROJECTS
+   GET /projects
+========================================= */
+
 const buildProjectList = async (req, res) => {
 
     try {
 
-        const projects = await getAllProjects();
+        const projects =
+            await getAllProjects();
 
-        res.render("projects", {
-            title: "Projects",
-            projects
-        });
+
+        const isLoggedIn =
+            !!(
+                req.session &&
+                req.session.user
+            );
+
+
+        res.render(
+            "projects",
+            {
+
+                title: "Projects",
+
+                projects,
+
+                isLoggedIn,
+
+                user:
+                    req.session?.user || null
+
+            }
+        );
 
     } catch (error) {
 
-        console.error("Error loading projects:", error);
+        console.error(
+            "ERROR - buildProjectList:",
+            error
+        );
 
-        res.status(500).render("500", {
-            title: "500 - Server Error"
-        });
+        throw error;
 
     }
 
 };
 
 
-/**
- * Display project details
- */
+/* =========================================
+   DISPLAY PROJECT DETAILS
+   GET /projects/:id
+========================================= */
+
 const buildProjectDetail = async (req, res) => {
 
     try {
 
         const projectId = req.params.id;
 
-        const project = await getProjectById(projectId);
+        const project =
+            await getProjectById(projectId);
 
         if (!project) {
 
-            return res.status(404).render("404", {
-                title: "Project Not Found"
-            });
-
+            return res.status(404).render(
+                "404",
+                {
+                    title: "Project Not Found"
+                }
+            );
         }
 
         const categories =
             await getCategoriesByProject(projectId);
 
-        res.render("project-details", {
-            title: project.name,
-            project,
-            categories
-        });
+        let isVolunteer = false;
+
+        const isLoggedIn =
+            Boolean(
+                req.session &&
+                req.session.user
+            );
+
+        if (isLoggedIn) {
+
+            const userId =
+                req.session.user.user_id;
+
+            isVolunteer =
+                await isUserVolunteer(
+                    userId,
+                    projectId
+                );
+        }
+
+        return res.render(
+            "project-details",
+            {
+                title: project.name,
+                project,
+                categories,
+                isVolunteer,
+                isLoggedIn
+            }
+        );
 
     } catch (error) {
 
         console.error(
-            "Error loading project details:",
+            "ERROR - buildProjectDetail:",
             error
         );
 
-        res.status(500).render("500", {
-            title: "500 - Server Error"
-        });
-
+        return res.status(500).render(
+            "500",
+            {
+                title: "500 - Server Error"
+            }
+        );
     }
-
 };
 
 
-/**
- * Display Create Project Form
- *
- * Admin only
- */
+/* =========================================
+   DISPLAY NEW PROJECT FORM
+   GET /projects/new-project
+========================================= */
+
 const buildNewProject = async (req, res) => {
 
     try {
@@ -94,523 +155,434 @@ const buildNewProject = async (req, res) => {
         const organizations =
             await getAllOrganizations();
 
-        res.render("new-project", {
-
-            title: "Create Project",
-
-            errors: [],
-
-            organizations,
-
-            project: {
-                name: "",
-                description: "",
-                organization_id: ""
+        return res.render(
+            "new-project",
+            {
+                title: "Create Project",
+                errors: [],
+                organizations,
+                project: {
+                    name: "",
+                    description: "",
+                    organization_id: ""
+                }
             }
-
-        });
+        );
 
     } catch (error) {
 
         console.error(
-            "Error loading create project page:",
+            "ERROR - buildNewProject:",
             error
         );
 
-        res.status(500).render("500", {
-            title: "500 - Server Error"
-        });
-
+        return res.status(500).render(
+            "500",
+            {
+                title: "500 - Server Error"
+            }
+        );
     }
-
 };
 
 
-/**
- * Process Create Project
- *
- * Admin only
- */
+/* =========================================
+   PROCESS NEW PROJECT
+   POST /projects/new-project
+========================================= */
+
 const addProject = async (req, res) => {
-
-    const {
-        name,
-        description,
-        organization_id
-    } = req.body;
-
-
-    const errors = [];
-
-
-    const cleanName = name
-        ? name.trim()
-        : "";
-
-    const cleanDescription = description
-        ? description.trim()
-        : "";
-
-
-    /*
-    =====================================
-    VALIDATION
-    =====================================
-    */
-
-
-    if (
-        !cleanName ||
-        cleanName.length < 3
-    ) {
-
-        errors.push({
-            msg: "Project name must be at least 3 characters."
-        });
-
-    }
-
-
-    if (cleanName.length > 100) {
-
-        errors.push({
-            msg: "Project name cannot exceed 100 characters."
-        });
-
-    }
-
-
-    if (!organization_id) {
-
-        errors.push({
-            msg: "Please select an organization."
-        });
-
-    }
-
-
-    /*
-    =====================================
-    RETURN FORM IF VALIDATION FAILS
-    =====================================
-    */
-
-    if (errors.length > 0) {
-
-        try {
-
-            const organizations =
-                await getAllOrganizations();
-
-            return res.render("new-project", {
-
-                title: "Create Project",
-
-                errors,
-
-                organizations,
-
-                project: {
-                    name: cleanName,
-                    description: cleanDescription,
-                    organization_id
-                }
-
-            });
-
-        } catch (error) {
-
-            console.error(
-                "Error loading organizations:",
-                error
-            );
-
-            return res.status(500).render("500", {
-                title: "500 - Server Error"
-            });
-
-        }
-
-    }
-
-
-    /*
-    =====================================
-    CREATE PROJECT
-    =====================================
-    */
 
     try {
 
-        await createProject(
-            cleanName,
-            cleanDescription,
+        const {
+            name,
+            description,
             organization_id
-        );
+        } = req.body;
 
+        const errors = [];
 
-        /*
-        =================================
-        SUCCESS FLASH MESSAGE
-        =================================
-        */
+        if (
+            !name ||
+            name.trim().length < 3
+        ) {
 
-        if (req.flash) {
-
-            req.flash(
-                "success",
-                "Project created successfully."
-            );
-
+            errors.push({
+                msg: "Project name must be at least 3 characters."
+            });
         }
 
+        if (
+            name &&
+            name.trim().length > 150
+        ) {
 
-        res.redirect("/projects");
+            errors.push({
+                msg: "Project name cannot exceed 150 characters."
+            });
+        }
 
-    } catch (error) {
+        if (
+            !description ||
+            description.trim().length < 10
+        ) {
 
-        console.error(
-            "Error creating project:",
-            error
-        );
+            errors.push({
+                msg: "Project description must be at least 10 characters."
+            });
+        }
 
+        if (!organization_id) {
 
-        /*
-        =================================
-        DATABASE ERROR
-        =================================
-        */
+            errors.push({
+                msg: "Please select an organization."
+            });
+        }
 
-        try {
+        if (errors.length > 0) {
 
             const organizations =
                 await getAllOrganizations();
 
-            return res.status(500).render(
+            return res.status(400).render(
                 "new-project",
                 {
-
                     title: "Create Project",
-
-                    errors: [
-                        {
-                            msg:
-                                "Unable to create the project. Please try again."
-                        }
-                    ],
-
+                    errors,
                     organizations,
-
-                    project: {
-                        name: cleanName,
-                        description: cleanDescription,
-                        organization_id
-                    }
-
+                    project: req.body
                 }
             );
-
-        } catch (renderError) {
-
-            console.error(
-                "Error rendering create project:",
-                renderError
-            );
-
-            return res.status(500).render("500", {
-                title: "500 - Server Error"
-            });
-
         }
 
-    }
+        await createProject(
+            name.trim(),
+            description.trim(),
+            organization_id
+        );
 
+        req.flash(
+            "success",
+            "Project created successfully."
+        );
+
+        return res.redirect(
+            "/projects"
+        );
+
+    } catch (error) {
+
+        console.error(
+            "ERROR - addProject:",
+            error
+        );
+
+        return res.status(500).render(
+            "500",
+            {
+                title: "500 - Server Error"
+            }
+        );
+    }
 };
 
 
-/**
- * Display Edit Project Form
- *
- * Admin only
- */
+/* =========================================
+   DISPLAY EDIT PROJECT FORM
+   GET /projects/edit-project/:id
+========================================= */
+
 const buildEditProject = async (req, res) => {
 
     try {
 
         const project =
-            await getProjectById(req.params.id);
-
+            await getProjectById(
+                req.params.id
+            );
 
         if (!project) {
 
-            return res.status(404).render("404", {
-                title: "Project Not Found"
-            });
-
+            return res.status(404).render(
+                "404",
+                {
+                    title: "Project Not Found"
+                }
+            );
         }
-
 
         const organizations =
             await getAllOrganizations();
 
-
-        res.render("edit-project", {
-
-            title: "Edit Project",
-
-            errors: [],
-
-            project,
-
-            organizations
-
-        });
+        return res.render(
+            "edit-project",
+            {
+                title: "Edit Project",
+                errors: [],
+                project,
+                organizations
+            }
+        );
 
     } catch (error) {
 
         console.error(
-            "Error loading edit project page:",
+            "ERROR - buildEditProject:",
             error
         );
 
-        res.status(500).render("500", {
-            title: "500 - Server Error"
-        });
-
+        return res.status(500).render(
+            "500",
+            {
+                title: "500 - Server Error"
+            }
+        );
     }
-
 };
 
 
-/**
- * Process Edit Project
- *
- * Admin only
- */
+/* =========================================
+   PROCESS EDIT PROJECT
+   POST /projects/edit-project/:id
+========================================= */
+
 const editProject = async (req, res) => {
 
-    const {
-        name,
-        description,
-        organization_id
-    } = req.body;
+    try {
 
+        const {
+            name,
+            description,
+            organization_id
+        } = req.body;
 
-    const errors = [];
+        const errors = [];
 
+        if (
+            !name ||
+            name.trim().length < 3
+        ) {
 
-    const cleanName = name
-        ? name.trim()
-        : "";
+            errors.push({
+                msg: "Project name must be at least 3 characters."
+            });
+        }
 
-    const cleanDescription = description
-        ? description.trim()
-        : "";
+        if (
+            name &&
+            name.trim().length > 150
+        ) {
 
+            errors.push({
+                msg: "Project name cannot exceed 150 characters."
+            });
+        }
 
-    /*
-    =====================================
-    VALIDATION
-    =====================================
-    */
+        if (
+            !description ||
+            description.trim().length < 10
+        ) {
 
+            errors.push({
+                msg: "Project description must be at least 10 characters."
+            });
+        }
 
-    if (
-        !cleanName ||
-        cleanName.length < 3
-    ) {
+        if (!organization_id) {
 
-        errors.push({
-            msg: "Project name must be at least 3 characters."
-        });
+            errors.push({
+                msg: "Please select an organization."
+            });
+        }
 
-    }
-
-
-    if (cleanName.length > 100) {
-
-        errors.push({
-            msg: "Project name cannot exceed 100 characters."
-        });
-
-    }
-
-
-    if (!organization_id) {
-
-        errors.push({
-            msg: "Please select an organization."
-        });
-
-    }
-
-
-    /*
-    =====================================
-    RETURN FORM IF VALIDATION FAILS
-    =====================================
-    */
-
-    if (errors.length > 0) {
-
-        try {
+        if (errors.length > 0) {
 
             const organizations =
                 await getAllOrganizations();
 
-            return res.render("edit-project", {
-
-                title: "Edit Project",
-
-                errors,
-
-                organizations,
-
-                project: {
-
-                    project_id: req.params.id,
-
-                    name: cleanName,
-
-                    description: cleanDescription,
-
-                    organization_id
-
+            return res.status(400).render(
+                "edit-project",
+                {
+                    title: "Edit Project",
+                    errors,
+                    organizations,
+                    project: {
+                        project_id: req.params.id,
+                        ...req.body
+                    }
                 }
+            );
+        }
 
-            });
+        await updateProject(
+            req.params.id,
+            name.trim(),
+            description.trim(),
+            organization_id
+        );
+
+        req.flash(
+            "success",
+            "Project updated successfully."
+        );
+
+        return res.redirect(
+            "/projects"
+        );
+
+    } catch (error) {
+
+        console.error(
+            "ERROR - editProject:",
+            error
+        );
+
+        return res.status(500).render(
+            "500",
+            {
+                title: "500 - Server Error"
+            }
+        );
+    }
+};
+
+
+/* =========================================
+   VOLUNTEER FOR PROJECT
+   POST /projects/:id/volunteer
+========================================= */
+
+const volunteerForProject = async (req, res) => {
+
+    try {
+
+        const projectId =
+            req.params.id;
+
+        const userId =
+            req.session.user.user_id;
+
+        const project =
+            await getProjectById(projectId);
+
+        if (!project) {
+
+            req.flash(
+                "error",
+                "The project could not be found."
+            );
+
+            return res.redirect(
+                "/projects"
+            );
+        }
+
+        await addVolunteer(
+            userId,
+            projectId
+        );
+
+        req.flash(
+            "success",
+            `You are now volunteering for "${project.name}".`
+        );
+
+        return res.redirect(
+            `/projects/${projectId}`
+        );
+
+    } catch (error) {
+
+        console.error(
+            "ERROR - volunteerForProject:",
+            error
+        );
+
+        return res.status(500).render(
+            "500",
+            {
+                title: "500 - Server Error"
+            }
+        );
+    }
+};
+
+
+/* =========================================
+   REMOVE VOLUNTEER
+   POST /projects/:id/remove-volunteer
+========================================= */
+
+const removeVolunteerFromProject =
+    async (req, res) => {
+
+        try {
+
+            const projectId =
+                req.params.id;
+
+            const userId =
+                req.session.user.user_id;
+
+            const project =
+                await getProjectById(projectId);
+
+            if (!project) {
+
+                req.flash(
+                    "error",
+                    "The project could not be found."
+                );
+
+                return res.redirect(
+                    "/projects"
+                );
+            }
+
+            await removeVolunteer(
+                userId,
+                projectId
+            );
+
+            req.flash(
+                "success",
+                `You are no longer volunteering for "${project.name}".`
+            );
+
+            return res.redirect(
+                `/projects/${projectId}`
+            );
 
         } catch (error) {
 
             console.error(
-                "Error loading organizations:",
+                "ERROR - removeVolunteer:",
                 error
             );
 
-            return res.status(500).render("500", {
-                title: "500 - Server Error"
-            });
-
-        }
-
-    }
-
-
-    /*
-    =====================================
-    UPDATE PROJECT
-    =====================================
-    */
-
-    try {
-
-        await updateProject(
-
-            req.params.id,
-
-            cleanName,
-
-            cleanDescription,
-
-            organization_id
-
-        );
-
-
-        /*
-        =================================
-        SUCCESS FLASH MESSAGE
-        =================================
-        */
-
-        if (req.flash) {
-
-            req.flash(
-                "success",
-                "Project updated successfully."
-            );
-
-        }
-
-
-        res.redirect("/projects");
-
-    } catch (error) {
-
-        console.error(
-            "Error updating project:",
-            error
-        );
-
-
-        try {
-
-            const organizations =
-                await getAllOrganizations();
-
-
             return res.status(500).render(
-                "edit-project",
+                "500",
                 {
-
-                    title: "Edit Project",
-
-                    errors: [
-                        {
-                            msg:
-                                "Unable to update the project. Please try again."
-                        }
-                    ],
-
-                    organizations,
-
-                    project: {
-
-                        project_id:
-                            req.params.id,
-
-                        name: cleanName,
-
-                        description:
-                            cleanDescription,
-
-                        organization_id
-
-                    }
-
+                    title: "500 - Server Error"
                 }
             );
-
-        } catch (renderError) {
-
-            console.error(
-                "Error rendering edit project:",
-                renderError
-            );
-
-            return res.status(500).render("500", {
-                title: "500 - Server Error"
-            });
-
         }
+    };
 
-    }
 
-};
-
+/* =========================================
+   EXPORT CONTROLLERS
+========================================= */
 
 export {
-
     buildProjectList,
-
     buildProjectDetail,
-
     buildNewProject,
-
     addProject,
-
     buildEditProject,
-
-    editProject
-
+    editProject,
+    volunteerForProject,
+    removeVolunteerFromProject
 };
+

@@ -1,158 +1,165 @@
 <%- include("partials/header") %>
 
-
 <main class="page-shell">
 
+    <!-- =========================================
+         DASHBOARD HEADER
+    ========================================== -->
 
-    <section class="dashboard-header">
+    <section class="page-heading">
 
         <span class="eyebrow">
-            MEMBER DASHBOARD
+            SERVICE NETWORK
         </span>
 
-
         <h1>
-            Welcome, <%= name %>
+            Welcome to Your Dashboard
         </h1>
 
+        <% if (user) { %>
 
-        <p>
-            Manage your account and access the service network.
-        </p>
+            <p>
+                Welcome,
+                <strong><%= user.name %></strong>!
+            </p>
+
+        <% } %>
 
     </section>
 
 
+    <!-- =========================================
+         VOLUNTEER PROJECTS
+    ========================================== -->
 
-    <section class="dashboard-grid">
+    <section class="dashboard-section">
 
-
-        <article class="dashboard-card">
-
-            <span class="dashboard-icon">
-                👤
-            </span>
-
+        <div class="section-heading">
 
             <h2>
-                Account Information
+                My Volunteer Projects
             </h2>
 
-
             <p>
-                <strong>Name:</strong>
-                <%= name %>
+                Projects you have signed up to volunteer for.
             </p>
 
-
-            <p>
-                <strong>Email:</strong>
-                <%= email %>
-            </p>
+        </div>
 
 
-            <p>
-                <strong>Role:</strong>
-                <%= user.role_name %>
-            </p>
-
-        </article>
+        <% if (
+            volunteerProjects &&
+            volunteerProjects.length > 0
+        ) { %>
 
 
+            <div class="card-grid">
 
-        <article class="dashboard-card">
+                <% volunteerProjects.forEach(project => { %>
 
-            <span class="dashboard-icon">
-                🌎
-            </span>
+                    <article class="content-card volunteer-card">
 
+                        <div class="card-content">
 
-            <h2>
-                Explore Service
-            </h2>
-
-
-            <p>
-                Browse organizations, projects,
-                and categories.
-            </p>
+                            <span class="eyebrow">
+                                VOLUNTEER PROJECT
+                            </span>
 
 
-            <a
-                class="action-link primary"
-                href="/projects">
+                            <h2>
 
-                Explore Projects
+                                <a
+                                    href="/projects/<%= project.project_id %>"
+                                >
+                                    <%= project.name %>
+                                </a>
 
-            </a>
-
-        </article>
-
-
-
-        <% if (user.role_name === "admin") { %>
+                            </h2>
 
 
-            <article class="dashboard-card admin-card">
+                            <p>
+                                <%= project.description %>
+                            </p>
 
-                <span class="dashboard-icon">
-                    🛡️
-                </span>
 
+                            <% if (project.organization_name) { %>
+
+                                <p class="contact-line">
+
+                                    <strong>
+                                        Organization:
+                                    </strong>
+
+                                    <%= project.organization_name %>
+
+                                </p>
+
+                            <% } %>
+
+
+                            <div class="button-row">
+
+                                <a
+                                    class="action-link secondary"
+                                    href="/projects/<%= project.project_id %>"
+                                >
+                                    View Project
+                                </a>
+
+
+                                <form
+                                    action="/projects/<%= project.project_id %>/remove-volunteer"
+                                    method="POST"
+                                    class="inline-form"
+                                >
+
+                                    <button
+                                        type="submit"
+                                        class="action-link danger"
+                                    >
+                                        Remove Volunteer
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                <% }) %>
+
+            </div>
+
+
+        <% } else { %>
+
+
+            <!-- =========================================
+                 NO VOLUNTEER PROJECTS
+            ========================================== -->
+
+            <div class="dashboard-card">
 
                 <h2>
-                    Administrator Tools
+                    You are not volunteering for any projects yet.
                 </h2>
 
-
                 <p>
-                    Manage users, organizations,
-                    projects, and categories.
+                    Browse the available service projects and
+                    choose one that you would like to volunteer for.
                 </p>
 
 
-                <div class="button-row">
+                <a
+                    href="/projects"
+                    class="action-link primary"
+                >
+                    Browse Projects
+                </a>
 
-
-                    <a
-                        class="action-link primary"
-                        href="/users">
-
-                        Manage Users
-
-                    </a>
-
-
-                    <a
-                        class="action-link secondary"
-                        href="/organizations/new-organization">
-
-                        Add Organization
-
-                    </a>
-
-
-                    <a
-                        class="action-link secondary"
-                        href="/projects/new-project">
-
-                        Add Project
-
-                    </a>
-
-
-                    <a
-                        class="action-link secondary"
-                        href="/categories/new-category">
-
-                        Add Category
-
-                    </a>
-
-
-                </div>
-
-            </article>
+            </div>
 
 
         <% } %>
@@ -160,7 +167,52 @@
 
     </section>
 
-</main>
 
+    <!-- =========================================
+         QUICK ACTIONS
+    ========================================== -->
+
+    <section class="dashboard-section">
+
+        <div class="section-heading">
+
+            <h2>
+                Quick Actions
+            </h2>
+
+        </div>
+
+
+        <div class="button-row">
+
+            <a
+                href="/projects"
+                class="action-link secondary"
+            >
+                View Projects
+            </a>
+
+
+            <a
+                href="/organizations"
+                class="action-link secondary"
+            >
+                View Organizations
+            </a>
+
+
+            <a
+                href="/categories"
+                class="action-link secondary"
+            >
+                View Categories
+            </a>
+
+        </div>
+
+    </section>
+
+
+</main>
 
 <%- include("partials/footer") %>
